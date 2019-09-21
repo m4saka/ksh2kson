@@ -94,7 +94,12 @@ int main(int argc, char *argv[])
                     { "jacket_author", chart.metaData.at("illustrator") },
                     { "information", {} },
                 }},
-                { "beat", {} },
+                { "beat", {
+                    { "bpm", {} },
+                    { "time_sig", {} },
+                    { "scroll_speed", {} },
+                    { "resolution", UNIT_MEASURE / 4 },
+                }},
                 { "gauge", {
                     { "total", {} },
                 }},
@@ -132,6 +137,25 @@ int main(int argc, char *argv[])
             if (chart.metaData.count("information"))
             {
                 kson["meta"]["information"] = chart.metaData.at("information");
+            }
+
+            for (const auto & [ y, tempo ] : chart.beatMap().tempoChanges())
+            {
+                kson["beat"]["bpm"].push_back({
+                    { "y", y },
+                    { "v", tempo },
+                });
+            }
+
+            for (const auto & [ y, timeSignature ] : chart.beatMap().timeSignatureChanges())
+            {
+                kson["beat"]["time_sig"].push_back({
+                    { "y", y },
+                    { "v", {
+                        { "n", timeSignature.numerator },
+                        { "d", timeSignature.denominator },
+                    }}
+                });
             }
 
             if (chart.metaData.count("total"))
