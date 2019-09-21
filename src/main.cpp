@@ -174,10 +174,42 @@ int main(int argc, char *argv[])
             {
                 for (const auto & [ y, fxNote ] : chart.fxLane(i))
                 {
-                    kson["note"]["fx"][0].push_back({
+                    kson["note"]["fx"][i].push_back({
                         { "y", y },
                         { "l", fxNote.length },
                     });
+                }
+            }
+
+            for (std::size_t i = 0; i < 2; ++i)
+            {
+                // TODO: convert laser slams
+                int sectionIdx = -1;
+                Measure prevY = -1;
+                Measure sectionOffsetY = -1;
+                for (const auto & [ y, laserNote ] : chart.laserLane(i))
+                {
+                    if (y != prevY)
+                    {
+                        // First note in a laser section
+                        kson["note"]["laser"][i].push_back({
+                            { "y", y },
+                            { "v", {} },
+                            { "wide", 1 }, // TODO: convert 2x wide section
+                        });
+                        sectionOffsetY = y;
+                        ++sectionIdx;
+
+                        kson["note"]["laser"][i][sectionIdx]["v"].push_back({
+                            { "ry", 0 },
+                            { "v", laserNote.startX },
+                        });
+                    }
+                    kson["note"]["laser"][i][sectionIdx]["v"].push_back({
+                        { "ry", y + laserNote.length - sectionOffsetY },
+                        { "v", laserNote.endX },
+                    });
+                    prevY = y + laserNote.length;
                 }
             }
 

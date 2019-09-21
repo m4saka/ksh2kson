@@ -6,11 +6,11 @@
 struct LaserNote final : public AbstractNote
 {
 public:
-    double startX;
-    double endX;
+    int startX;
+    int endX;
     LaneSpin laneSpin;
 
-    LaserNote(Measure length, double startX, double endX, Measure posForJudgmentAlignment = 0, bool halvesCombo = false, const LaneSpin & laneSpin = LaneSpin());
+    LaserNote(Measure length, int startX, int endX, Measure posForJudgmentAlignment = 0, bool halvesCombo = false, const LaneSpin & laneSpin = LaneSpin());
 
     bool isSlam() const
     {

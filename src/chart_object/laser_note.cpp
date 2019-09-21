@@ -1,8 +1,8 @@
 #include "chart_object/laser_note.hpp"
 
-constexpr int LASER_X_MAX = 1000;
+constexpr int LASER_X_MAX = 100;
 
-LaserNote::LaserNote(Measure length, double startX, double endX, Measure posForJudgmentAlignment, bool halvesCombo, const LaneSpin & laneSpin)
+LaserNote::LaserNote(Measure length, int startX, int endX, Measure posForJudgmentAlignment, bool halvesCombo, const LaneSpin & laneSpin)
     : AbstractNote(length)
     , startX(startX)
     , endX(endX)
