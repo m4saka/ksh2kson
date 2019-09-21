@@ -99,7 +99,18 @@ int main(int argc, char *argv[])
                     { "total", {} },
                 }},
                 { "note", {} },
-                { "audio", {} },
+                { "audio", {
+                    { "bgm", {
+                        { "filename", chart.metaData.at("m") },
+                        { "vol", {} },
+                        { "offset", std::stoi(chart.metaData.at("o")) },
+                        { "preview_filename", {} },
+                        { "preview_offset", std::stoi(chart.metaData.at("po")) },
+                        { "preview_duration", std::stoi(chart.metaData.at("plength")) },
+                    }},
+                    { "key_sound", {} },
+                    { "audio_effect", {} },
+                }},
                 { "camera", {} },
                 { "bg", {} },
                 { "impl", {} },
@@ -126,6 +137,11 @@ int main(int argc, char *argv[])
             if (chart.metaData.count("total"))
             {
                 kson["gauge"]["total"] = std::stod(chart.metaData.at("total"));
+            }
+
+            if (chart.metaData.count("mvol"))
+            {
+                kson["audio"]["bgm"]["vol"] = std::stod(chart.metaData.at("mvol"));
             }
 
             // TODO: Save to file
