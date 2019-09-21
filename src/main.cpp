@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstddef>
 #include <nlohmann/json.hpp>
 #include "ksh/playable_chart.hpp"
 
@@ -154,8 +155,30 @@ int main(int argc, char *argv[])
                     { "v", {
                         { "n", timeSignature.numerator },
                         { "d", timeSignature.denominator },
-                    }}
+                    }},
                 });
+            }
+
+            for (std::size_t i = 0; i < 4; ++i)
+            {
+                for (const auto & [ y, btNote ] : chart.btLane(i))
+                {
+                    kson["note"]["bt"][i].push_back({
+                        { "y", y },
+                        { "l", btNote.length },
+                    });
+                }
+            }
+
+            for (std::size_t i = 0; i < 2; ++i)
+            {
+                for (const auto & [ y, fxNote ] : chart.fxLane(i))
+                {
+                    kson["note"]["fx"][0].push_back({
+                        { "y", y },
+                        { "l", fxNote.length },
+                    });
+                }
             }
 
             if (chart.metaData.count("total"))
