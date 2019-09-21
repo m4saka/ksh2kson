@@ -78,7 +78,12 @@ namespace ksh
 
     bool PlayableChart::insertTempoChange(std::map<Measure, double> & tempoChanges, Measure pos, const std::string & value)
     {
-        if (value.find('-') == std::string::npos)
+        if (tempoChanges.count(pos))
+        {
+            tempoChanges[pos] = std::stod(value);
+            return true;
+        }
+        else if (value.find('-') == std::string::npos)
         {
             tempoChanges.emplace(pos, std::stod(value));
             return true;

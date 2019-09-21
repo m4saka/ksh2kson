@@ -103,6 +103,24 @@ int main(int argc, char *argv[])
                 { "impl", {} },
             };
 
+            // If "t" is different from actual initial tempo or '-' is found in tempo, set disp_bpm to it
+            // Note: tempo value is multiplied by 1000 and casted to int before comparison because the precision of ksh tempo is 0.001
+            if (static_cast<int>(std::stod(chart.metaData.at("t")) * 1000) != static_cast<int>(chart.beatMap().tempo(0) * 1000) ||
+                chart.metaData.at("t").find('-') != std::string::npos)
+            {
+                kson["meta"]["disp_bpm"] = chart.metaData.at("t");
+            }
+
+            if (chart.metaData.count("to"))
+            {
+                kson["meta"]["std_bpm"] = std::stod(chart.metaData.at("to"));
+            }
+
+            if (chart.metaData.count("information"))
+            {
+                kson["meta"]["information"] = chart.metaData.at("information");
+            }
+
             // TODO: Save to file
             std::cout << kson << std::endl;
         }

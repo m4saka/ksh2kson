@@ -33,4 +33,14 @@ public:
     bool isBarLine(Measure measure) const;
     double tempo(Measure measure) const;
     TimeSignature timeSignature(Measure measure) const;
+
+    const std::map<Measure, double> & tempoChanges() const
+    {
+        return m_tempoChanges;
+    }
+
+    const std::map<int, TimeSignature> & timeSignatureChanges() const
+    {
+        return m_timeSignatureChanges;
+    }
 };

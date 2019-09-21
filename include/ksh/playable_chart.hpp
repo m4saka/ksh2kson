@@ -40,6 +40,11 @@ namespace ksh
 
         virtual ~PlayableChart() = default;
 
+        const BeatMap & beatMap() const
+        {
+            return *m_beatMap;
+        }
+
         const Lane<BTNote> & btLane(std::size_t idx) const
         {
             return m_btLanes.at(idx);
