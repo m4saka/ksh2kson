@@ -4,3 +4,4 @@ set(CMAKE_CXX_FLAGS "-O2 -std=c++17 -Wall -Wextra -Wpedantic -Wno-unused-paramet
 file(GLOB_RECURSE SRCS ${PROJECT_SOURCE_DIR}/src/*.cpp)
 add_executable(ksh2kson ${SRCS})
 target_include_directories(ksh2kson PRIVATE ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(ksh2kson PRIVATE ${PROJECT_SOURCE_DIR}/third_party/json/include)
