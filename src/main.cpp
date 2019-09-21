@@ -183,7 +183,6 @@ int main(int argc, char *argv[])
 
             for (std::size_t i = 0; i < 2; ++i)
             {
-                // TODO: convert laser slams
                 int sectionIdx = -1;
                 Measure prevY = -1;
                 Measure sectionOffsetY = -1;
@@ -205,10 +204,19 @@ int main(int argc, char *argv[])
                             { "v", laserNote.startX },
                         });
                     }
-                    kson["note"]["laser"][i][sectionIdx]["v"].push_back({
-                        { "ry", y + laserNote.length - sectionOffsetY },
-                        { "v", laserNote.endX },
-                    });
+                    if (laserNote.length <= UNIT_MEASURE / 32)
+                    {
+                        // Laser slams
+                        kson["note"]["laser"][i][sectionIdx]["v"].back()["vf"] = laserNote.endX;
+                    }
+                    else
+                    {
+                        // Normal laser notes
+                        kson["note"]["laser"][i][sectionIdx]["v"].push_back({
+                            { "ry", y + laserNote.length - sectionOffsetY },
+                            { "v", laserNote.endX },
+                        });
+                    }
                     prevY = y + laserNote.length;
                 }
             }
