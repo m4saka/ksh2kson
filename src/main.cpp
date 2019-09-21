@@ -165,8 +165,11 @@ int main(int argc, char *argv[])
                 {
                     kson["note"]["bt"][i].push_back({
                         { "y", y },
-                        { "l", btNote.length },
                     });
+                    if (btNote.length > 0)
+                    {
+                        kson["note"]["bt"][i].back()["l"] = btNote.length;
+                    }
                 }
             }
 
@@ -176,8 +179,11 @@ int main(int argc, char *argv[])
                 {
                     kson["note"]["fx"][i].push_back({
                         { "y", y },
-                        { "l", fxNote.length },
                     });
+                    if (fxNote.length > 0)
+                    {
+                        kson["note"]["fx"][i].back()["l"] = fxNote.length;
+                    }
                 }
             }
 
