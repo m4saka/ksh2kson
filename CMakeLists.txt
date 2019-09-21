@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 2.8)
+project(ksh2kson CXX)
+set(CMAKE_CXX_FLAGS "-O2 -std=c++17 -Wall -Wextra -Wpedantic -Wno-unused-parameter")
+file(GLOB_RECURSE SRCS ${PROJECT_SOURCE_DIR}/src/*.cpp)
+add_executable(ksh2kson ${SRCS})
+target_include_directories(ksh2kson PRIVATE ${PROJECT_SOURCE_DIR}/include)
