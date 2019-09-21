@@ -95,7 +95,9 @@ int main(int argc, char *argv[])
                     { "information", {} },
                 }},
                 { "beat", {} },
-                { "gauge", {} },
+                { "gauge", {
+                    { "total", {} },
+                }},
                 { "note", {} },
                 { "audio", {} },
                 { "camera", {} },
@@ -119,6 +121,11 @@ int main(int argc, char *argv[])
             if (chart.metaData.count("information"))
             {
                 kson["meta"]["information"] = chart.metaData.at("information");
+            }
+
+            if (chart.metaData.count("total"))
+            {
+                kson["gauge"]["total"] = std::stod(chart.metaData.at("total"));
             }
 
             // TODO: Save to file
