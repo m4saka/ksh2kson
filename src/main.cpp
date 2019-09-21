@@ -5,10 +5,13 @@ int main(int argc, char *argv[])
 {
     if (argc >= 2)
     {
-        ksh::PlayableChart chart(argv[1]);
+        for (int i = 1; i < argc; ++i)
+        {
+            ksh::PlayableChart chart(argv[i]);
 
-        // TODO: Convert to kson
-        std::cout << chart.comboCount() << std::endl;
+            // TODO: Convert to kson
+            std::cout << chart.comboCount() << std::endl;
+        }
     }
     else
     {
