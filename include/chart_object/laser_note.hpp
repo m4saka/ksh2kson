@@ -17,5 +17,7 @@ public:
         return length <= UNIT_MEASURE / 32;
     }
 
+
+    static constexpr int X_MAX = 100;
     static int charToLaserX(unsigned char c);
 };

@@ -1,7 +1,5 @@
 #include "chart_object/laser_note.hpp"
 
-constexpr int LASER_X_MAX = 100;
-
 LaserNote::LaserNote(Measure length, int startX, int endX, Measure posForJudgmentAlignment, bool halvesCombo, const LaneSpin & laneSpin)
     : AbstractNote(length)
     , startX(startX)
@@ -29,15 +27,15 @@ int LaserNote::charToLaserX(unsigned char c)
 {
     if (c >= '0' && c <= '9')
     {
-        return (c - '0') * LASER_X_MAX / 50;
+        return (c - '0') * X_MAX / 50;
     }
     else if (c >= 'A' && c <= 'Z')
     {
-        return (c - 'A' + 10) * LASER_X_MAX / 50;
+        return (c - 'A' + 10) * X_MAX / 50;
     }
     else if (c >= 'a' && c <= 'o')
     {
-        return (c - 'a' + 36) * LASER_X_MAX / 50;
+        return (c - 'a' + 36) * X_MAX / 50;
     }
     else
     {

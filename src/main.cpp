@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
                 { "audio", {
                     { "bgm", {
                         { "filename", chart.metaData.at("m") },
-                        { "vol", {} },
+                        { "vol", 1.0 },
                         { "offset", std::stoi(chart.metaData.at("o")) },
                         { "preview_filename", {} },
                         { "preview_offset", std::stoi(chart.metaData.at("po")) },
@@ -207,20 +207,20 @@ int main(int argc, char *argv[])
 
                         kson["note"]["laser"][i][sectionIdx]["v"].push_back({
                             { "ry", 0 },
-                            { "v", laserNote.startX },
+                            { "v", static_cast<double>(laserNote.startX) / LaserNote::X_MAX },
                         });
                     }
                     if (laserNote.length <= UNIT_MEASURE / 32)
                     {
                         // Laser slams
-                        kson["note"]["laser"][i][sectionIdx]["v"].back()["vf"] = laserNote.endX;
+                        kson["note"]["laser"][i][sectionIdx]["v"].back()["vf"] = static_cast<double>(laserNote.endX) / LaserNote::X_MAX;
                     }
                     else
                     {
                         // Normal laser notes
                         kson["note"]["laser"][i][sectionIdx]["v"].push_back({
                             { "ry", y + laserNote.length - sectionOffsetY },
-                            { "v", laserNote.endX },
+                            { "v", static_cast<double>(laserNote.endX) / LaserNote::X_MAX },
                         });
                     }
                     prevY = y + laserNote.length;
@@ -234,7 +234,7 @@ int main(int argc, char *argv[])
 
             if (chart.metaData.count("mvol"))
             {
-                kson["audio"]["bgm"]["vol"] = std::stod(chart.metaData.at("mvol"));
+                kson["audio"]["bgm"]["vol"] = std::stod(chart.metaData.at("mvol")) / 100.0;
             }
 
             // TODO: Save to file
