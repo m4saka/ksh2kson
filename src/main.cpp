@@ -73,53 +73,24 @@ int main(int argc, char *argv[])
         {
             ksh::PlayableChart chart(argv[i]);
 
-            // TODO: Convert to kson
-            json kson = {
-                { "version", "1.0.0" },
-                { "meta", {
-                    { "title", chart.metaData.at("title") },
-                    { "title_translit", {} },
-                    { "subtitle", {} },
-                    { "artist", chart.metaData.at("artist") },
-                    { "artist_translit", {} },
-                    { "chart_author", chart.metaData.at("effect") },
-                    { "difficulty", {
-                        { "name", getDifficultyName(chart.metaData.at("difficulty")) },
-                        { "short_name", getDifficultyShortName(chart.metaData.at("difficulty")) },
-                        { "idx", getDifficultyIdx(chart.metaData.at("difficulty")) },
-                    }},
-                    { "level", std::stoi(chart.metaData.at("level")) },
-                    { "disp_bpm", {} },
-                    { "std_bpm", {} },
-                    { "jacket_filename", chart.metaData.at("jacket") },
-                    { "jacket_author", chart.metaData.at("illustrator") },
-                    { "information", {} },
+            json metaData = {
+                { "title", chart.metaData.at("title") },
+                { "title_translit", {} },
+                { "subtitle", {} },
+                { "artist", chart.metaData.at("artist") },
+                { "artist_translit", {} },
+                { "chart_author", chart.metaData.at("effect") },
+                { "difficulty", {
+                    { "name", getDifficultyName(chart.metaData.at("difficulty")) },
+                    { "short_name", getDifficultyShortName(chart.metaData.at("difficulty")) },
+                    { "idx", getDifficultyIdx(chart.metaData.at("difficulty")) },
                 }},
-                { "beat", {
-                    { "bpm", {} },
-                    { "time_sig", {} },
-                    { "scroll_speed", {} },
-                    { "resolution", UNIT_MEASURE / 4 },
-                }},
-                { "gauge", {
-                    { "total", {} },
-                }},
-                { "note", {} },
-                { "audio", {
-                    { "bgm", {
-                        { "filename", chart.metaData.at("m") },
-                        { "vol", 1.0 },
-                        { "offset", std::stoi(chart.metaData.at("o")) },
-                        { "preview_filename", {} },
-                        { "preview_offset", std::stoi(chart.metaData.at("po")) },
-                        { "preview_duration", std::stoi(chart.metaData.at("plength")) },
-                    }},
-                    { "key_sound", {} },
-                    { "audio_effect", {} },
-                }},
-                { "camera", {} },
-                { "bg", {} },
-                { "impl", {} },
+                { "level", std::stoi(chart.metaData.at("level")) },
+                { "disp_bpm", {} },
+                { "std_bpm", {} },
+                { "jacket_filename", chart.metaData.at("jacket") },
+                { "jacket_author", chart.metaData.at("illustrator") },
+                { "information", {} },
             };
 
             // If "t" is different from actual initial tempo or '-' is found in tempo, set disp_bpm to it
@@ -127,22 +98,29 @@ int main(int argc, char *argv[])
             if (static_cast<int>(std::stod(chart.metaData.at("t")) * 1000) != static_cast<int>(chart.beatMap().tempo(0) * 1000) ||
                 chart.metaData.at("t").find('-') != std::string::npos)
             {
-                kson["meta"]["disp_bpm"] = chart.metaData.at("t");
+                metaData["disp_bpm"] = chart.metaData.at("t");
             }
 
             if (chart.metaData.count("to"))
             {
-                kson["meta"]["std_bpm"] = std::stod(chart.metaData.at("to"));
+                metaData["std_bpm"] = std::stod(chart.metaData.at("to"));
             }
 
             if (chart.metaData.count("information"))
             {
-                kson["meta"]["information"] = chart.metaData.at("information");
+                metaData["information"] = chart.metaData.at("information");
             }
+
+            json beatData = {
+                { "bpm", {} },
+                { "time_sig", {} },
+                { "scroll_speed", {} },
+                { "resolution", UNIT_MEASURE / 4 },
+            };
 
             for (const auto & [ y, tempo ] : chart.beatMap().tempoChanges())
             {
-                kson["beat"]["bpm"].push_back({
+                beatData["bpm"].push_back({
                     { "y", y },
                     { "v", tempo },
                 });
@@ -150,7 +128,7 @@ int main(int argc, char *argv[])
 
             for (const auto & [ y, timeSignature ] : chart.beatMap().timeSignatureChanges())
             {
-                kson["beat"]["time_sig"].push_back({
+                beatData["time_sig"].push_back({
                     { "y", y },
                     { "v", {
                         { "n", timeSignature.numerator },
@@ -159,16 +137,27 @@ int main(int argc, char *argv[])
                 });
             }
 
+            json gaugeData = {
+                { "total", {} },
+            };
+
+            if (chart.metaData.count("total"))
+            {
+                gaugeData["total"] = std::stod(chart.metaData.at("total"));
+            }
+
+            json noteData = {};
+
             for (std::size_t i = 0; i < 4; ++i)
             {
                 for (const auto & [ y, btNote ] : chart.btLane(i))
                 {
-                    kson["note"]["bt"][i].push_back({
+                    noteData["bt"][i].push_back({
                         { "y", y },
                     });
                     if (btNote.length > 0)
                     {
-                        kson["note"]["bt"][i].back()["l"] = btNote.length;
+                        noteData["bt"][i].back()["l"] = btNote.length;
                     }
                 }
             }
@@ -177,12 +166,12 @@ int main(int argc, char *argv[])
             {
                 for (const auto & [ y, fxNote ] : chart.fxLane(i))
                 {
-                    kson["note"]["fx"][i].push_back({
+                    noteData["fx"][i].push_back({
                         { "y", y },
                     });
                     if (fxNote.length > 0)
                     {
-                        kson["note"]["fx"][i].back()["l"] = fxNote.length;
+                        noteData["fx"][i].back()["l"] = fxNote.length;
                     }
                 }
             }
@@ -197,7 +186,7 @@ int main(int argc, char *argv[])
                     if (y != prevY)
                     {
                         // First note in a laser section
-                        kson["note"]["laser"][i].push_back({
+                        noteData["laser"][i].push_back({
                             { "y", y },
                             { "v", {} },
                             { "wide", 1 }, // TODO: convert 2x wide section
@@ -205,7 +194,7 @@ int main(int argc, char *argv[])
                         sectionOffsetY = y;
                         ++sectionIdx;
 
-                        kson["note"]["laser"][i][sectionIdx]["v"].push_back({
+                        noteData["laser"][i][sectionIdx]["v"].push_back({
                             { "ry", 0 },
                             { "v", static_cast<double>(laserNote.startX) / LaserNote::X_MAX },
                         });
@@ -213,12 +202,12 @@ int main(int argc, char *argv[])
                     if (laserNote.length <= UNIT_MEASURE / 32)
                     {
                         // Laser slams
-                        kson["note"]["laser"][i][sectionIdx]["v"].back()["vf"] = static_cast<double>(laserNote.endX) / LaserNote::X_MAX;
+                        noteData["laser"][i][sectionIdx]["v"].back()["vf"] = static_cast<double>(laserNote.endX) / LaserNote::X_MAX;
                     }
                     else
                     {
                         // Normal laser notes
-                        kson["note"]["laser"][i][sectionIdx]["v"].push_back({
+                        noteData["laser"][i][sectionIdx]["v"].push_back({
                             { "ry", y + laserNote.length - sectionOffsetY },
                             { "v", static_cast<double>(laserNote.endX) / LaserNote::X_MAX },
                         });
@@ -227,15 +216,39 @@ int main(int argc, char *argv[])
                 }
             }
 
-            if (chart.metaData.count("total"))
-            {
-                kson["gauge"]["total"] = std::stod(chart.metaData.at("total"));
-            }
+            json audioData = {
+                { "bgm", {
+                    { "filename", chart.metaData.at("m") },
+                    { "vol", 1.0 },
+                    { "offset", std::stoi(chart.metaData.at("o")) },
+                    { "preview_filename", {} },
+                    { "preview_offset", std::stoi(chart.metaData.at("po")) },
+                    { "preview_duration", std::stoi(chart.metaData.at("plength")) },
+                }},
+                { "key_sound", {} },
+                { "audio_effect", {} },
+            };
 
             if (chart.metaData.count("mvol"))
             {
-                kson["audio"]["bgm"]["vol"] = std::stod(chart.metaData.at("mvol")) / 100.0;
+                audioData["bgm"]["vol"] = std::stod(chart.metaData.at("mvol")) / 100.0;
             }
+
+            json cameraData = {};
+
+            json bgData = {};
+
+            json kson = {
+                { "version", "1.0.0" },
+                { "meta", metaData },
+                { "beat", beatData },
+                { "gauge", gaugeData },
+                { "note", noteData },
+                { "audio", audioData },
+                { "camera", cameraData },
+                { "bg", bgData },
+                { "impl", {} },
+            };
 
             // TODO: Save to file
             std::cout << kson << std::endl;

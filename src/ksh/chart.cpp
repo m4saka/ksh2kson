@@ -31,7 +31,8 @@ namespace ksh
         while (std::getline(m_ifs, line, '\n'))
         {
             // Eliminate CR
-            if(!line.empty() && *line.crbegin() == '\r') {
+            if (!line.empty() && *line.crbegin() == '\r')
+            {
                 line.pop_back();
             }
 
