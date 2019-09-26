@@ -2,7 +2,7 @@
 
 ## TODO List
 
-- Lane zooms
+- ~~Lane zooms~~
 - Background image / animations
 - Audio effects of FX notes (e.g. Flanger)
 - Audio effects of laser notes (e.g. HPF)

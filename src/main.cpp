@@ -234,7 +234,52 @@ int main(int argc, char *argv[])
                 audioData["bgm"]["vol"] = std::stod(chart.metaData.at("mvol")) / 100.0;
             }
 
-            json cameraData = {};
+            json cameraData = {
+                { "body", {
+                    { "zoom", {} },
+                    { "shift_x", {} },
+                    { "rotation_x", {} },
+                    { "rotation_z", {} },
+                }},
+                { "tilt_assign", {} },
+                { "pattern", {} },
+            };
+
+            for (const auto & [ y, zoom ] : chart.bottomLaneZooms())
+            {
+                cameraData["body"]["zoom"].push_back({
+                    { "y", y },
+                    { "v", zoom.first / 100.0 },
+                });
+                if (zoom.first != zoom.second)
+                {
+                    cameraData["body"]["zoom"].back()["vf"] = zoom.second / 100.0;
+                }
+            }
+
+            for (const auto & [ y, zoom ] : chart.topLaneZooms())
+            {
+                cameraData["body"]["rotation_x"].push_back({
+                    { "y", y },
+                    { "v", zoom.first / 100.0 },
+                });
+                if (zoom.first != zoom.second)
+                {
+                    cameraData["body"]["rotation_x"].back()["vf"] = zoom.second / 100.0;
+                }
+            }
+
+            for (const auto & [ y, zoom ] : chart.sideLaneZooms())
+            {
+                cameraData["body"]["shift_x"].push_back({
+                    { "y", y },
+                    { "v", zoom.first / 100.0 },
+                });
+                if (zoom.first != zoom.second)
+                {
+                    cameraData["body"]["shift_x"].back()["vf"] = zoom.second / 100.0;
+                }
+            }
 
             json bgData = {};
 
