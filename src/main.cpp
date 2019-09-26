@@ -235,14 +235,20 @@ int main(int argc, char *argv[])
             }
 
             json cameraData = {
-                { "body", {
-                    { "zoom", {} },
-                    { "shift_x", {} },
-                    { "rotation_x", {} },
-                    { "rotation_z", {} },
+                { "tilt", {
+                    { "manual", {} },
+                    { "keep", {} },
                 }},
-                { "tilt_assign", {} },
-                { "pattern", {} },
+                { "cam", {
+                    { "body", {
+                        { "zoom", {} },
+                        { "shift_x", {} },
+                        { "rotation_x", {} },
+                        { "rotation_z", {} },
+                    }},
+                    { "tilt_assign", {} },
+                    { "pattern", {} },
+                }},
             };
 
             for (const auto & [ y, zoom ] : chart.bottomLaneZooms())
