@@ -65,7 +65,7 @@ int getDifficultyIdx(const std::string & str)
     }
 }
 
-json convertToKson(const ksh::PlayableChart & chart)
+json getKsonMetaData(const ksh::PlayableChart & chart)
 {
     json metaData = {
         { "title", chart.metaData.at("title") },
@@ -105,6 +105,11 @@ json convertToKson(const ksh::PlayableChart & chart)
         metaData["information"] = chart.metaData.at("information");
     }
 
+    return metaData;
+}
+
+json getKsonBeatData(const ksh::PlayableChart & chart)
+{
     json beatData = {
         { "bpm", {} },
         { "time_sig", {} },
@@ -131,6 +136,11 @@ json convertToKson(const ksh::PlayableChart & chart)
         });
     }
 
+    return beatData;
+}
+
+json getKsonGaugeData(const ksh::PlayableChart & chart)
+{
     json gaugeData = {
         { "total", {} },
     };
@@ -140,6 +150,11 @@ json convertToKson(const ksh::PlayableChart & chart)
         gaugeData["total"] = std::stod(chart.metaData.at("total"));
     }
 
+    return gaugeData;
+}
+
+json getKsonNoteData(const ksh::PlayableChart & chart)
+{
     json noteData = {};
 
     for (std::size_t i = 0; i < 4; ++i)
@@ -210,6 +225,11 @@ json convertToKson(const ksh::PlayableChart & chart)
         }
     }
 
+    return noteData;
+}
+
+json getKsonAudioData(const ksh::PlayableChart & chart)
+{
     json audioData = {
         { "bgm", {
             { "filename", chart.metaData.at("m") },
@@ -228,6 +248,11 @@ json convertToKson(const ksh::PlayableChart & chart)
         audioData["bgm"]["vol"] = std::stod(chart.metaData.at("mvol")) / 100.0;
     }
 
+    return audioData;
+}
+
+json getKsonCameraData(const ksh::PlayableChart & chart)
+{
     json cameraData = {
         { "tilt", {
             { "manual", {} },
@@ -281,17 +306,25 @@ json convertToKson(const ksh::PlayableChart & chart)
         }
     }
 
-    json bgData = {};
+    return cameraData;
+}
 
+json getKsonBgData(const ksh::PlayableChart & chart)
+{
+    return {};
+}
+
+json convertToKson(const ksh::PlayableChart & chart)
+{
     return json{
         { "version", "1.0.0" },
-        { "meta", metaData },
-        { "beat", beatData },
-        { "gauge", gaugeData },
-        { "note", noteData },
-        { "audio", audioData },
-        { "camera", cameraData },
-        { "bg", bgData },
+        { "meta", getKsonMetaData(chart) },
+        { "beat", getKsonBeatData(chart) },
+        { "gauge", getKsonGaugeData(chart) },
+        { "note", getKsonNoteData(chart) },
+        { "audio", getKsonAudioData(chart) },
+        { "camera", getKsonCameraData(chart) },
+        { "bg", getKsonBgData(chart) },
         { "impl", {} },
     };
 }
