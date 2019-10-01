@@ -3,6 +3,7 @@
 ## TODO List
 
 - ~~Lane zooms~~
+- ~~Spins~~
 - Background image / animations
 - Audio effects of FX notes (e.g. Flanger)
 - Audio effects of laser notes (e.g. HPF)
@@ -10,6 +11,5 @@
 - Key sounds of laser slams
 - Scroll speed changes (stops)
 - Tilts
-- Spins
 - Movies
 - Custom audio effects
