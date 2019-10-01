@@ -65,6 +65,21 @@ int getDifficultyIdx(const std::string & str)
     }
 }
 
+const char *getLaneSpinCamPattrernName(LaneSpin::Type type)
+{
+    switch (type)
+    {
+    case LaneSpin::Type::Normal:
+        return "spin";
+    case LaneSpin::Type::Half:
+        return "half_spin";
+    case LaneSpin::Type::Swing:
+        return "swing";
+    default:
+        return "";
+    }
+}
+
 json getKsonMetaData(const ksh::PlayableChart & chart)
 {
     json metaData = {
@@ -272,7 +287,11 @@ json getKsonCameraData(const ksh::PlayableChart & chart)
                 { "rotation_z", {} },
             }},
             { "tilt_assign", {} },
-            { "pattern", {} },
+            { "pattern", {
+                { "def", {} },
+                { "pulse_event", {} },
+                { "note_event", {} },
+            }},
         }},
     };
 
@@ -309,6 +328,36 @@ json getKsonCameraData(const ksh::PlayableChart & chart)
         if (zoom.first != zoom.second)
         {
             cameraData["body"]["shift_x"].back()["vf"] = zoom.second / 100.0;
+        }
+    }
+
+    for (std::size_t i = 0; i < 2; ++i)
+    {
+        int sectionIdx = -1;
+        Measure prevY = -1;
+        int pointIdx = 0;
+        for (const auto & [ y, laserNote ] : chart.laserLane(i))
+        {
+            if (y != prevY)
+            {
+                ++sectionIdx;
+                pointIdx = 0;
+            }
+            if (laserNote.laneSpin.type != LaneSpin::Type::NoSpin)
+            {
+                // TODO: Set parameters for swings
+                cameraData["cam"]["pattern"]["note_event"][getLaneSpinCamPattrernName(laserNote.laneSpin.type)]["laser"].push_back({
+                    { "lane", i },
+                    { "sec", sectionIdx },
+                    { "idx", pointIdx },
+                    { "v", {
+                        { "l", laserNote.laneSpin.length },
+                        { "scale", (laserNote.laneSpin.direction == LaneSpin::Direction::Left) ? -1.0 : 1.0 },
+                    }},
+                });
+            }
+            prevY = y + laserNote.length;
+            ++pointIdx;
         }
     }
 

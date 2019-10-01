@@ -93,7 +93,7 @@ namespace ksh
                     preparedNoteLaserEndX,
                     m_preparedNotePos,
                     m_preparedNoteHalvesCombo,
-                    m_preparedLaneSpin));
+                    m_preparedNoteLength <= UNIT_MEASURE / 32 ? m_preparedLaneSpin : LaneSpin()));
 
             m_notePrepared = false;
         }
