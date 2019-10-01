@@ -76,16 +76,16 @@ namespace ksh
         }
     }
 
-    bool PlayableChart::insertTempoChange(std::map<Measure, double> & tempoChanges, Measure pos, const std::string & value)
+    bool PlayableChart::insertTempoChange(std::map<Measure, double> & tempoChanges, Measure y, const std::string & value)
     {
-        if (tempoChanges.count(pos))
+        if (tempoChanges.count(y))
         {
-            tempoChanges[pos] = std::stod(value);
+            tempoChanges[y] = std::stod(value);
             return true;
         }
         else if (value.find('-') == std::string::npos)
         {
-            tempoChanges.emplace(pos, std::stod(value));
+            tempoChanges.emplace(y, std::stod(value));
             return true;
         }
         else
@@ -164,7 +164,7 @@ namespace ksh
         }
         else
         {
-            timeSignatureChanges[0] = {4, 4};
+            timeSignatureChanges[0] = { 4, 4 };
         }
 
         // Buffers
@@ -204,18 +204,18 @@ namespace ksh
             }
             else if (isOptionLine(line))
             {
-                auto option = splitOptionLine(line);
-                if (option.first == "t")
+                auto [ key, value ] = splitOptionLine(line);
+                if (key == "t")
                 {
-                    if (option.second.find('-') == std::string::npos)
+                    if (value.find('-') == std::string::npos)
                     {
-                        currentTempo = std::stod(option.second);
+                        currentTempo = std::stod(value);
                     }
-                    optionLines.emplace_back(chartLines.size(), option);
+                    optionLines.emplace_back(chartLines.size(), std::make_pair(key, value));
                 }
-                else if (option.first == "beat")
+                else if (key == "beat")
                 {
-                    TimeSignature timeSignature = parseTimeSignature(option.second);
+                    TimeSignature timeSignature = parseTimeSignature(value);
                     timeSignatureChanges.emplace(
                         measureCount,
                         timeSignature
@@ -223,55 +223,57 @@ namespace ksh
                     currentNumerator = timeSignature.numerator;
                     currentDenominator = timeSignature.denominator;
                 }
-                else if (option.first == "fx-l")
+                else if (key == "fx-l")
                 {
-                    currentFXAudioEffectStrs[0] = option.second;
+                    currentFXAudioEffectStrs[0] = value;
                 }
-                else if (option.first == "fx-r")
+                else if (key == "fx-r")
                 {
-                    currentFXAudioEffectStrs[1] = option.second;
+                    currentFXAudioEffectStrs[1] = value;
                 }
-                else if (option.first == "fx-l_param1")
+                else if (key == "fx-l_param1")
                 {
-                    currentFXAudioEffectParamStrs[0] = option.second;
+                    currentFXAudioEffectParamStrs[0] = value;
                 }
-                else if (option.first == "fx-r_param1")
+                else if (key == "fx-r_param1")
                 {
-                    currentFXAudioEffectParamStrs[1] = option.second;
+                    currentFXAudioEffectParamStrs[1] = value;
                 }
                 else
                 {
-                    optionLines.emplace_back(chartLines.size(), option);
+                    optionLines.emplace_back(chartLines.size(), std::make_pair(key, value));
                 }
             }
             else if (isBarLine(line))
             {
                 std::size_t resolution = chartLines.size();
-                Measure linePosDiff = UNIT_MEASURE * currentNumerator / currentDenominator / resolution;
+                Measure lineYDiff = UNIT_MEASURE * currentNumerator / currentDenominator / resolution;
 
                 // Add options that require their position
-                for (auto && optionLine : optionLines)
+                for (const auto & [ lineIdx, option ] : optionLines)
                 {
-                    Measure pos = currentMeasure + linePosDiff * optionLine.first;
-                    std::pair<std::string, std::string> & option = optionLine.second;
-                    if (option.first == "t")
+                    const auto & [ key, value ] = option;
+                    Measure y = currentMeasure + lineYDiff * lineIdx;
+                    if (key == "t")
                     {
-                        insertTempoChange(tempoChanges, pos, option.second);
+                        insertTempoChange(tempoChanges, y, value);
                     }
-                    else if (option.first == "zoom_top")
+                    else if (key == "zoom_top")
                     {
-                        m_topLaneZooms.insert(pos, std::stod(option.second));
+                        m_topLaneZooms.insert(y, std::stod(value));
                     }
-                    else if (option.first == "zoom_bottom")
+                    else if (key == "zoom_bottom")
                     {
-                        m_bottomLaneZooms.insert(pos, std::stod(option.second));
+                        m_bottomLaneZooms.insert(y, std::stod(value));
                     }
-                    else if (option.first == "zoom_side")
+                    else if (key == "zoom_side")
                     {
-                        m_sideLaneZooms.insert(pos, std::stod(option.second));
+                        m_sideLaneZooms.insert(y, std::stod(value));
                     }
-
-                    // TODO: Store other options
+                    else
+                    {
+                        m_positionalOptions[key][y] = value;
+                    }
                 }
 
                 // Add notes
@@ -281,7 +283,7 @@ namespace ksh
                     std::size_t currentBlock = 0;
                     std::size_t laneCount = 0;
 
-                    const Measure pos = currentMeasure + linePosDiff * i;
+                    const Measure y = currentMeasure + lineYDiff * i;
 
                     for (std::size_t j = 0; j < buf.size(); ++j)
                     {
@@ -298,11 +300,11 @@ namespace ksh
                             switch (buf[j])
                             {
                             case '2': // Long BT note
-                                btNoteBuilders[laneCount].prepareNote(pos, halvesCombo(currentTempo));
-                                btNoteBuilders[laneCount].extendPreparedNoteLength(linePosDiff);
+                                btNoteBuilders[laneCount].prepareNote(y, halvesCombo(currentTempo));
+                                btNoteBuilders[laneCount].extendPreparedNoteLength(lineYDiff);
                                 break;
                             case '1': // Chip BT note
-                                m_btLanes[laneCount].emplace(pos, BTNote(0));
+                                m_btLanes[laneCount].emplace(y, BTNote(0));
                                 break;
                             default:  // Empty
                                 btNoteBuilders[laneCount].addPreparedNote();
@@ -314,7 +316,7 @@ namespace ksh
                             switch (buf[j])
                             {
                             case '2': // Chip FX note
-                                m_fxLanes[laneCount].emplace(pos, FXNote(0));
+                                m_fxLanes[laneCount].emplace(y, FXNote(0));
                                 break;
                             case '0': // Empty
                                 fxNoteBuilders[laneCount].addPreparedNote();
@@ -323,14 +325,14 @@ namespace ksh
                                 if (isEditor)
                                 {
                                     const std::string audioEffectStr = (buf[j] == '1') ? currentFXAudioEffectStrs[laneCount] : kshLegacyFXCharToAudioEffect(buf[j]);
-                                    fxNoteBuilders[laneCount].prepareNote(pos, halvesCombo(currentTempo), audioEffectStr, currentFXAudioEffectParamStrs[laneCount], true);
+                                    fxNoteBuilders[laneCount].prepareNote(y, halvesCombo(currentTempo), audioEffectStr, currentFXAudioEffectParamStrs[laneCount], true);
                                 }
                                 else
                                 {
-                                    fxNoteBuilders[laneCount].prepareNote(pos, halvesCombo(currentTempo));
+                                    fxNoteBuilders[laneCount].prepareNote(y, halvesCombo(currentTempo));
                                     // TODO: Add audio effects independently for the game (because one FX note can have multiple audio effects)
                                 }
-                                fxNoteBuilders[laneCount].extendPreparedNoteLength(linePosDiff);
+                                fxNoteBuilders[laneCount].extendPreparedNoteLength(lineYDiff);
                             }
                         }
                         else if (currentBlock == BLOCK_LASER && laneCount < 2) // Laser notes
@@ -342,15 +344,15 @@ namespace ksh
                                 laserNoteBuilders[laneCount].resetPreparedNote();
                                 break;
                             case ':': // Connection
-                                laserNoteBuilders[laneCount].extendPreparedNoteLength(linePosDiff);
+                                laserNoteBuilders[laneCount].extendPreparedNoteLength(lineYDiff);
                                 break;
                             default:
                                 const int laserX = LaserNote::charToLaserX(buf[j]);
                                 if (laserX >= 0)
                                 {
                                     laserNoteBuilders[laneCount].addPreparedNote(laserX);
-                                    laserNoteBuilders[laneCount].prepareNote(pos, halvesCombo(currentTempo), laserX);
-                                    laserNoteBuilders[laneCount].extendPreparedNoteLength(linePosDiff);
+                                    laserNoteBuilders[laneCount].prepareNote(y, halvesCombo(currentTempo), laserX);
+                                    laserNoteBuilders[laneCount].extendPreparedNoteLength(lineYDiff);
                                 }
                             }
                         }

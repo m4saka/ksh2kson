@@ -33,6 +33,7 @@ namespace ksh
         LineGraph m_topLaneZooms;
         LineGraph m_bottomLaneZooms;
         LineGraph m_sideLaneZooms;
+        std::unordered_map<std::string, std::map<Measure, std::string>> m_positionalOptions;
         PlayableChart(const std::string & filename, bool isEditor);
 
     public:
