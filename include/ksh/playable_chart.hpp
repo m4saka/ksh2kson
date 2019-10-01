@@ -91,6 +91,11 @@ namespace ksh
             return m_sideLaneZooms;
         }
 
+        const std::unordered_map<std::string, std::map<Measure, std::string>> & positionalOptions() const
+        {
+            return m_positionalOptions;
+        }
+
         std::size_t comboCount() const;
     };
 

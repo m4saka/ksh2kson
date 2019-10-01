@@ -194,15 +194,21 @@ json getKsonNoteData(const ksh::PlayableChart & chart)
         {
             if (y != prevY)
             {
-                // First note in a laser section
+                // Determine if the laser section is in wide mode
+                const std::string kshWideKey = (i == 0) ? "laserrange_l" : "laserrange_r";
+                const auto & options = chart.positionalOptions();
+                int wide = (options.count(kshWideKey) && options.at(kshWideKey).count(y) && options.at(kshWideKey).at(y) == "2x") ? 2 : 1;
+
+                // Insert a laser section
                 noteData["laser"][i].push_back({
                     { "y", y },
                     { "v", {} },
-                    { "wide", 1 }, // TODO: convert 2x wide section
+                    { "wide", wide },
                 });
                 sectionOffsetY = y;
                 ++sectionIdx;
 
+                // First point in the laser section
                 noteData["laser"][i][sectionIdx]["v"].push_back({
                     { "ry", 0 },
                     { "v", static_cast<double>(laserNote.startX) / LaserNote::X_MAX },
