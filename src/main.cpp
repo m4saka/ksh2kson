@@ -345,14 +345,36 @@ json getKsonCameraData(const ksh::PlayableChart & chart)
             }
             if (laserNote.laneSpin.type != LaneSpin::Type::NoSpin)
             {
-                cameraData["cam"]["pattern"]["note_event"][getLaneSpinCamPatternName(laserNote.laneSpin.type)]["laser"].push_back({
+                const auto & spin = laserNote.laneSpin;
+
+                json v;
+                if (spin.type == LaneSpin::Type::Swing)
+                {
+                    v = {
+                        { "l", spin.length },
+                        {
+                            "scale",
+                            ((spin.direction == LaneSpin::Direction::Left) ? -1.0 : 1.0) * spin.swingAmplitude * 0.6 / 100
+                            // Note: In ksh, zoom_side / 3 = Swing Amplitude / 5
+                        },
+                        { "repeat", spin.swingFrequency },
+                        { "decay_order", spin.swingDecayOrder },
+                        // "repeat_scale" is -1.0 in default
+                    };
+                }
+                else
+                {
+                    v = {
+                        { "l", spin.length },
+                        { "scale", (spin.direction == LaneSpin::Direction::Left) ? -1.0 : 1.0 },
+                    };
+                }
+
+                cameraData["cam"]["pattern"]["note_event"][getLaneSpinCamPatternName(spin.type)]["laser"].push_back({
                     { "lane", i },
                     { "sec", sectionIdx },
                     { "idx", pointIdx },
-                    { "v", {
-                        { "l", laserNote.laneSpin.length },
-                        { "scale", (laserNote.laneSpin.direction == LaneSpin::Direction::Left) ? -1.0 : 1.0 },
-                    }},
+                    { "v", v },
                 });
             }
             prevY = y + laserNote.length;
