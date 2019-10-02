@@ -363,8 +363,10 @@ namespace ksh
                             if (laneSpin.type != LaneSpin::Type::NoSpin && laneSpin.direction != LaneSpin::Direction::Unspecified)
                             {
                                 // Assign to the laser note builder if valid
-                                const int laneIdx = (laneSpin.direction == LaneSpin::Direction::Left) ? 0 : 1;
-                                laserNoteBuilders[laneIdx].prepareLaneSpin(laneSpin);
+                                for (std::size_t k = 0; k < laserNoteBuilders.size(); ++k)
+                                {
+                                    laserNoteBuilders[k].prepareLaneSpin(laneSpin);
+                                }
                             }
                         }
                         ++laneCount;
