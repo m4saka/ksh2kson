@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cstddef>
 #include <nlohmann/json.hpp>
-#include "ksh/playable_chart.hpp"
+#include "ksh/editable_chart.hpp"
 
 using json = nlohmann::json;
 
@@ -80,7 +80,30 @@ const char *getLaneSpinCamPatternName(LaneSpin::Type type)
     }
 }
 
-json getKsonMetaData(const ksh::PlayableChart & chart)
+std::tuple<std::string, int, int> splitAudioEffectStr(const std::string & str)
+{
+    const std::size_t semicolonIdx1 = str.find(';');
+    if (semicolonIdx1 == std::string::npos)
+    {
+        return std::make_tuple(str, 0, 0);
+    }
+    else
+    {
+        std::string str1 = str.substr(0, semicolonIdx1);
+        std::string str2 = str.substr(semicolonIdx1 + 1);
+        const std::size_t semicolonIdx2 = str2.find(';');
+        if (semicolonIdx2 == std::string::npos)
+        {
+            return std::make_tuple(str1, std::stoi(str2), 0);
+        }
+        else
+        {
+            return std::make_tuple(str1, std::stoi(str2.substr(0, semicolonIdx2)), std::stoi(str2.substr(semicolonIdx2 + 1)));
+        }
+    }
+}
+
+json getKsonMetaData(const ksh::EditableChart & chart)
 {
     json metaData = {
         { "title", chart.metaData.at("title") },
@@ -123,7 +146,7 @@ json getKsonMetaData(const ksh::PlayableChart & chart)
     return metaData;
 }
 
-json getKsonBeatData(const ksh::PlayableChart & chart)
+json getKsonBeatData(const ksh::EditableChart & chart)
 {
     json beatData = {
         { "bpm", {} },
@@ -154,7 +177,7 @@ json getKsonBeatData(const ksh::PlayableChart & chart)
     return beatData;
 }
 
-json getKsonGaugeData(const ksh::PlayableChart & chart)
+json getKsonGaugeData(const ksh::EditableChart & chart)
 {
     json gaugeData = {
         { "total", {} },
@@ -168,7 +191,7 @@ json getKsonGaugeData(const ksh::PlayableChart & chart)
     return gaugeData;
 }
 
-json getKsonNoteData(const ksh::PlayableChart & chart)
+json getKsonNoteData(const ksh::EditableChart & chart)
 {
     json noteData = {};
 
@@ -186,6 +209,7 @@ json getKsonNoteData(const ksh::PlayableChart & chart)
         }
     }
 
+    // FIXME: Long FX notes are split by audio effect changes
     for (std::size_t i = 0; i < 2; ++i)
     {
         for (const auto & [ y, fxNote ] : chart.fxLane(i))
@@ -249,7 +273,7 @@ json getKsonNoteData(const ksh::PlayableChart & chart)
     return noteData;
 }
 
-json getKsonAudioData(const ksh::PlayableChart & chart)
+json getKsonAudioData(const ksh::EditableChart & chart)
 {
     json audioData = {
         { "bgm", {
@@ -261,7 +285,11 @@ json getKsonAudioData(const ksh::PlayableChart & chart)
             { "preview_duration", std::stoi(chart.metaData.at("plength")) },
         }},
         { "key_sound", {} },
-        { "audio_effect", {} },
+        { "audio_effect", {
+            { "def", {} },
+            { "pulse_event", {} },
+            { "note_event", {} },
+        }},
     };
 
     if (chart.metaData.count("mvol"))
@@ -269,10 +297,61 @@ json getKsonAudioData(const ksh::PlayableChart & chart)
         audioData["bgm"]["vol"] = std::stod(chart.metaData.at("mvol")) / 100.0;
     }
 
+    for (std::size_t i = 0; i < 2; ++i)
+    {
+        std::size_t idx = 0;
+        for (const auto & [ y, fxNote ] : chart.fxLane(i))
+        {
+            if (fxNote.length > 0 && !fxNote.audioEffectStr.empty())
+            {
+                auto [ name, param1, param2 ] = splitAudioEffectStr(fxNote.audioEffectStr);
+                json v;
+                if (name == "Echo")
+                {
+                    v["wave_length"] = { "1/" + std::to_string(param1) };
+                    v["feedback"] = { std::to_string(param2) + "%" };
+                }
+                else if (name == "Retrigger" || name == "Gate" || name == "Wobble")
+                {
+                    v["wave_length"] = { "1/" + std::to_string(param1) };
+                }
+                else if (name == "PitchShift")
+                {
+                    v["pitch"] = { std::to_string(param1) };
+                }
+                else if (name == "BitCrusher")
+                {
+                    v["reduction"] = { std::to_string(param1) };
+                }
+                else if (name == "TapeStop")
+                {
+                    v["speed"] = { std::to_string(param1) };
+                }
+
+                if (v.empty())
+                {
+                    audioData["audio_effect"]["note_event"][name]["fx"].push_back({
+                        { "lane", i },
+                        { "idx", idx },
+                    });
+                }
+                else
+                {
+                    audioData["audio_effect"]["note_event"][name]["fx"].push_back({
+                        { "lane", i },
+                        { "idx", idx },
+                        { "v", v },
+                    });
+                }
+            }
+            ++idx;
+        }
+    }
+
     return audioData;
 }
 
-json getKsonCameraData(const ksh::PlayableChart & chart)
+json getKsonCameraData(const ksh::EditableChart & chart)
 {
     json cameraData = {
         { "tilt", {
@@ -385,12 +464,12 @@ json getKsonCameraData(const ksh::PlayableChart & chart)
     return cameraData;
 }
 
-json getKsonBgData(const ksh::PlayableChart & chart)
+json getKsonBgData(const ksh::EditableChart & chart)
 {
     return {};
 }
 
-json convertToKson(const ksh::PlayableChart & chart)
+json convertToKson(const ksh::EditableChart & chart)
 {
     return json{
         { "version", "1.0.0" },
@@ -411,7 +490,7 @@ int main(int argc, char *argv[])
     {
         for (int i = 1; i < argc; ++i)
         {
-            ksh::PlayableChart chart(argv[i]);
+            ksh::EditableChart chart(argv[i]);
             auto kson = convertToKson(chart);
 
             // TODO: Save to file

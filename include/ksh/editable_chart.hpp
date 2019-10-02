@@ -11,6 +11,13 @@ namespace ksh
     public:
         EditableChart(const std::string & filename) : PlayableChart(filename, true) {}
 
+        using PlayableChart::btLane;
+        using PlayableChart::fxLane;
+        using PlayableChart::laserLane;
+        using PlayableChart::btLanes;
+        using PlayableChart::fxLanes;
+        using PlayableChart::laserLanes;
+
         Lane<BTNote> & btLane(std::size_t idx)
         {
             return m_btLanes.at(idx);
