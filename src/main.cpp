@@ -65,7 +65,7 @@ int getDifficultyIdx(const std::string & str)
     }
 }
 
-const char *getLaneSpinCamPattrernName(LaneSpin::Type type)
+const char *getLaneSpinCamPatternName(LaneSpin::Type type)
 {
     switch (type)
     {
@@ -345,8 +345,7 @@ json getKsonCameraData(const ksh::PlayableChart & chart)
             }
             if (laserNote.laneSpin.type != LaneSpin::Type::NoSpin)
             {
-                // TODO: Set parameters for swings
-                cameraData["cam"]["pattern"]["note_event"][getLaneSpinCamPattrernName(laserNote.laneSpin.type)]["laser"].push_back({
+                cameraData["cam"]["pattern"]["note_event"][getLaneSpinCamPatternName(laserNote.laneSpin.type)]["laser"].push_back({
                     { "lane", i },
                     { "sec", sectionIdx },
                     { "idx", pointIdx },
