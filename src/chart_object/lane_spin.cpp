@@ -1,4 +1,7 @@
 #include "chart_object/lane_spin.hpp"
+
+#include <sstream>
+#include <tuple>
 #include "beat_map/time_signature.hpp"
 
 Measure kshLengthToMeasure(const std::string & str)
@@ -12,7 +15,29 @@ std::string measureToKshLength(Measure measure)
     return std::to_string(measure * 192 / UNIT_MEASURE);
 }
 
-LaneSpin::LaneSpin(std::string strFromKsh)
+std::tuple<Measure, int, std::size_t, int> splitSwingParams(const std::string & paramStr)
+{
+    std::array<std::string, 4> params{
+        "192", "250", "3", "2"
+    };
+
+    std::stringstream ss(paramStr);
+    std::string s;
+    int i = 0;
+    while (i < 4 && std::getline(ss, s, ';'))
+    {
+        params[i] = s;
+        ++i;
+    }
+
+    return std::make_tuple(
+        kshLengthToMeasure(params[0]),
+        std::stoi(params[1]),
+        static_cast<std::size_t>(std::stoll(params[2])),
+        std::stoi(params[3]));
+}
+
+LaneSpin::LaneSpin(const std::string & strFromKsh)
 {
     // A .ksh spin string should have at least 3 chars
     if (strFromKsh.length() < 3)
@@ -85,6 +110,10 @@ LaneSpin::LaneSpin(std::string strFromKsh)
     {
         length = 0;
     }
+    else if (type == Type::Swing)
+    {
+        std::tie(length, swingAmplitude, swingFrequency, swingDecayOrder) = splitSwingParams(strFromKsh.substr(2));
+    }
     else
     {
         length = kshLengthToMeasure(strFromKsh.substr(2));
@@ -109,7 +138,13 @@ std::string LaneSpin::toString() const
             return std::string("@") + ((direction == Direction::Left) ? "<" : ">") + measureToKshLength(length);
 
         case Type::Swing:
-            return std::string("S") + ((direction == Direction::Left) ? "<" : ">") + measureToKshLength(length);
+            return
+                std::string("S") +
+                ((direction == Direction::Left) ? "<" : ">") +
+                measureToKshLength(length) + ";" +
+                std::to_string(swingAmplitude) + ";" +
+                std::to_string(swingFrequency) + ";" +
+                std::to_string(swingDecayOrder);
 
         default:
             return "";

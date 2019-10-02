@@ -360,7 +360,7 @@ namespace ksh
                         {
                             // Create a lane spin from string
                             const LaneSpin laneSpin(buf.substr(j));
-                            if (laneSpin.type != LaneSpin::Type::NoSpin && laneSpin.direction != LaneSpin::Direction::Unspecified)
+                            if (laneSpin.isValid())
                             {
                                 // Assign to the laser note builder if valid
                                 for (std::size_t k = 0; k < laserNoteBuilders.size(); ++k)
