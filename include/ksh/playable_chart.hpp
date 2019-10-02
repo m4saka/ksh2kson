@@ -23,7 +23,7 @@ namespace ksh
     class PlayableChart : public Chart
     {
     private:
-        bool insertTempoChange(std::map<Measure, double> & tempoChanges, Measure pos, const std::string & value);
+        bool insertTempoChange(std::map<Measure, double> & tempoChanges, Measure y, const std::string & value);
 
     protected:
         std::unique_ptr<BeatMap> m_beatMap;

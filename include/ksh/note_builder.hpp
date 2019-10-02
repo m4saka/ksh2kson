@@ -41,7 +41,7 @@ namespace ksh
         void addPreparedNote();
 
         // Prepare a long BT note
-        void prepareNote(Measure pos, bool halvesCombo);
+        void prepareNote(Measure y, bool halvesCombo);
     };
 
     class FXNoteBuilder : public AbstractNoteBuilder
@@ -59,7 +59,7 @@ namespace ksh
         void addPreparedNote();
 
         // Prepare a long FX note (in editor, notes are split if audio effects are different)
-        void prepareNote(Measure pos, bool halvesCombo, const std::string & audioEffectStr = "", const std::string & audioEffectParamStr = "", bool isEditor = false);
+        void prepareNote(Measure y, bool halvesCombo, const std::string & audioEffectStr = "", const std::string & audioEffectParamStr = "", bool isEditor = false);
     };
 
     class LaserNoteBuilder : public AbstractNoteBuilder
@@ -75,7 +75,7 @@ namespace ksh
         void addPreparedNote(int preparedNoteLaserEndX);
 
         // Prepare a laser note
-        void prepareNote(Measure pos, bool halvesCombo, int laserStartX);
+        void prepareNote(Measure y, bool halvesCombo, int laserStartX);
 
         // Prepare a lane spin
         void prepareLaneSpin(const LaneSpin & laneSpin);

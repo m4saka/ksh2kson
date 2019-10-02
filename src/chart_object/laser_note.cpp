@@ -1,13 +1,13 @@
 #include "chart_object/laser_note.hpp"
 
-LaserNote::LaserNote(Measure length, int startX, int endX, Measure posForJudgmentAlignment, bool halvesCombo, const LaneSpin & laneSpin)
+LaserNote::LaserNote(Measure length, int startX, int endX, Measure judgmentAlignmentOffsetY, bool halvesCombo, const LaneSpin & laneSpin)
     : AbstractNote(length)
     , startX(startX)
     , endX(endX)
     , laneSpin(laneSpin)
 {
-    Measure judgmentStart = (posForJudgmentAlignment + judgmentInterval(halvesCombo) - 1) / judgmentInterval(halvesCombo) * judgmentInterval(halvesCombo) - posForJudgmentAlignment;
-    Measure judgmentEnd = length;
+    Measure judgmentStartY = (judgmentAlignmentOffsetY + judgmentInterval(halvesCombo) - 1) / judgmentInterval(halvesCombo) * judgmentInterval(halvesCombo) - judgmentAlignmentOffsetY;
+    Measure judgmentEndY = length;
 
     if (length <= UNIT_MEASURE / 32 && startX != endX) // Laser slam
     {
@@ -16,9 +16,9 @@ LaserNote::LaserNote(Measure length, int startX, int endX, Measure posForJudgmen
     else
     {
         Measure interval = judgmentInterval(halvesCombo);
-        for (Measure pos = judgmentStart; pos < judgmentEnd; pos += interval)
+        for (Measure y = judgmentStartY; y < judgmentEndY; y += interval)
         {
-            m_judgments.emplace(pos, NoteJudgment(interval));
+            m_judgments.emplace(y, NoteJudgment(interval));
         }
     }
 }

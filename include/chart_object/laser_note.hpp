@@ -10,7 +10,7 @@ public:
     int endX;
     LaneSpin laneSpin;
 
-    LaserNote(Measure length, int startX, int endX, Measure posForJudgmentAlignment = 0, bool halvesCombo = false, const LaneSpin & laneSpin = LaneSpin());
+    LaserNote(Measure length, int startX, int endX, Measure judgmentAlignmentOffsetY = 0, bool halvesCombo = false, const LaneSpin & laneSpin = LaneSpin());
 
     bool isSlam() const
     {

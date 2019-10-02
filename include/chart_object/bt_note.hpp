@@ -5,7 +5,7 @@
 struct BTNote final : public AbstractNote
 {
 public:
-    explicit BTNote(Measure length, Measure posForJudgmentAlignment = 0, bool halvesCombo = false)
+    explicit BTNote(Measure length, Measure judgmentAlignmentOffsetY = 0, bool halvesCombo = false)
         : AbstractNote(length)
     {
         if (length == 0)
@@ -22,11 +22,11 @@ public:
         {
             // Long BT Note (long enough to have multiple judgments)
             Measure interval = judgmentInterval(halvesCombo);
-            Measure judgmentStart = ((posForJudgmentAlignment + interval - 1) / interval + 1) * interval - posForJudgmentAlignment;
-            Measure judgmentEnd = length - interval;
-            for (Measure pos = judgmentStart; pos < judgmentEnd; pos += interval)
+            Measure judgmentStartY = ((judgmentAlignmentOffsetY + interval - 1) / interval + 1) * interval - judgmentAlignmentOffsetY;
+            Measure judgmentEndY = length - interval;
+            for (Measure y = judgmentStartY; y < judgmentEndY; y += interval)
             {
-                m_judgments.emplace(pos, NoteJudgment((pos > judgmentEnd - interval * 2) ? (judgmentEnd - pos) : interval));
+                m_judgments.emplace(y, NoteJudgment((y > judgmentEndY - interval * 2) ? (judgmentEndY - y) : interval));
             }
         }
     }

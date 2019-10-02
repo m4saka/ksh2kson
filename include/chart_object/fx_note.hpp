@@ -11,13 +11,13 @@ public:
     std::string audioEffectStr;
     std::string audioEffectParamStr;
 
-    explicit FXNote(Measure length, const std::string audioEffectStr = "", const std::string audioEffectParamStr = "", Measure posForJudgmentAlignment = 0, bool halvesCombo = false)
+    explicit FXNote(Measure length, const std::string audioEffectStr = "", const std::string audioEffectParamStr = "", Measure judgmentAlignmentOffsetY = 0, bool halvesCombo = false)
         : AbstractNote(length)
         , audioEffectStr(audioEffectStr)
         , audioEffectParamStr(audioEffectParamStr)
     {
-        Measure judgmentStart = ((posForJudgmentAlignment + judgmentInterval(halvesCombo) - 1) / judgmentInterval(halvesCombo) + 1) * judgmentInterval(halvesCombo) - posForJudgmentAlignment;
-        Measure judgmentEnd = length - judgmentInterval(halvesCombo);
+        Measure judgmentStartY = ((judgmentAlignmentOffsetY + judgmentInterval(halvesCombo) - 1) / judgmentInterval(halvesCombo) + 1) * judgmentInterval(halvesCombo) - judgmentAlignmentOffsetY;
+        Measure judgmentEndY = length - judgmentInterval(halvesCombo);
 
         if (length == 0)
         {
@@ -33,9 +33,9 @@ public:
         {
             // Long FX Note (long enough to have multiple judgments)
             Measure interval = judgmentInterval(halvesCombo);
-            for (Measure pos = judgmentStart; pos < judgmentEnd; pos += interval)
+            for (Measure y = judgmentStartY; y < judgmentEndY; y += interval)
             {
-                m_judgments.emplace(pos, NoteJudgment((pos > judgmentEnd - interval * 2) ? (judgmentEnd - pos) : interval));
+                m_judgments.emplace(y, NoteJudgment((y > judgmentEndY - interval * 2) ? (judgmentEndY - y) : interval));
             }
         }
     }

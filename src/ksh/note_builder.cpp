@@ -38,12 +38,12 @@ namespace ksh
         }
     }
 
-    void BTNoteBuilder::prepareNote(Measure pos, bool halvesCombo)
+    void BTNoteBuilder::prepareNote(Measure y, bool halvesCombo)
     {
         if (!m_notePrepared)
         {
             m_notePrepared = true;
-            m_preparedNotePos = pos;
+            m_preparedNotePos = y;
             m_preparedNoteLength = 0;
             m_preparedNoteHalvesCombo = halvesCombo;
         }
@@ -63,13 +63,13 @@ namespace ksh
         }
     }
 
-    void FXNoteBuilder::prepareNote(Measure pos, bool halvesCombo, const std::string & audioEffectStr, const std::string & audioEffectParamStr, bool isEditor)
+    void FXNoteBuilder::prepareNote(Measure y, bool halvesCombo, const std::string & audioEffectStr, const std::string & audioEffectParamStr, bool isEditor)
     {
         if (!m_notePrepared && (!isEditor || audioEffectStr != m_preparedNoteAudioEffectStr || audioEffectParamStr != m_preparedNoteAudioEffectParamStr))
         {
             addPreparedNote();
             m_notePrepared = true;
-            m_preparedNotePos = pos;
+            m_preparedNotePos = y;
             m_preparedNoteLength = 0;
             m_preparedNoteHalvesCombo = halvesCombo;
             m_preparedNoteAudioEffectStr = audioEffectStr;
@@ -99,10 +99,10 @@ namespace ksh
         }
     }
 
-    void LaserNoteBuilder::prepareNote(Measure pos, bool halvesCombo, int laserStartX)
+    void LaserNoteBuilder::prepareNote(Measure y, bool halvesCombo, int laserStartX)
     {
         m_notePrepared = true;
-        m_preparedNotePos = pos;
+        m_preparedNotePos = y;
         m_preparedNoteLength = 0;
         m_preparedNoteHalvesCombo = halvesCombo;
         m_preparedNoteLaserStartX = laserStartX;
