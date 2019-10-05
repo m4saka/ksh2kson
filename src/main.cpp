@@ -247,7 +247,6 @@ json getKsonNoteData(const ksh::PlayableChart & chart)
         }
     }
 
-    // FIXME: Long FX notes are split by audio effect changes
     for (std::size_t i = 0; i < 2; ++i)
     {
         for (const auto & [ y, fxNote ] : chart.fxLane(i))
