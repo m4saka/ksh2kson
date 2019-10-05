@@ -66,11 +66,11 @@ namespace ksh
         case 'L': return "Gate;24";
         case 'J': return "Gate;32";
         case 'F': return "Flanger";
-        case 'P': return "PitchShift";
-        case 'B': return "BitCrusher";
+        case 'P': return "PitchShift;12";
+        case 'B': return "BitCrusher;5";
         case 'Q': return "Phaser";
         case 'X': return "Wobble;12";
-        case 'A': return "TapeStop";
+        case 'A': return "TapeStop;17";
         case 'D': return "SideChain";
         default:  return "";
         }

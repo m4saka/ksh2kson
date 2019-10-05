@@ -85,7 +85,38 @@ std::tuple<std::string, int, int> splitAudioEffectStr(const std::string & str)
     const std::size_t semicolonIdx1 = str.find(';');
     if (semicolonIdx1 == std::string::npos)
     {
-        return std::make_tuple(str, 0, 0);
+        if (str == "Retrigger")
+        {
+            return std::make_tuple(str, 8, 0);
+        }
+        else if (str == "Gate")
+        {
+            return std::make_tuple(str, 4, 0);
+        }
+        else if (str == "PitchShift")
+        {
+            return std::make_tuple(str, 12, 0);
+        }
+        else if (str == "BitCrusher")
+        {
+            return std::make_tuple(str, 5, 0);
+        }
+        else if (str == "Wobble")
+        {
+            return std::make_tuple(str, 12, 0);
+        }
+        else if (str == "TapeStop")
+        {
+            return std::make_tuple(str, 50, 0);
+        }
+        else if (str == "Echo")
+        {
+            return std::make_tuple(str, 4, 60);
+        }
+        else
+        {
+            return std::make_tuple(str, 0, 0);
+        }
     }
     else
     {
@@ -94,7 +125,14 @@ std::tuple<std::string, int, int> splitAudioEffectStr(const std::string & str)
         const std::size_t semicolonIdx2 = str2.find(';');
         if (semicolonIdx2 == std::string::npos)
         {
-            return std::make_tuple(str1, std::stoi(str2), 0);
+            if (str1 == "Echo")
+            {
+                return std::make_tuple(str1, std::stoi(str2), 60);
+            }
+            else
+            {
+                return std::make_tuple(str1, std::stoi(str2), 0);
+            }
         }
         else
         {
