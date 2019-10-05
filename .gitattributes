@@ -1,2 +1,2 @@
-* linguist-vendored
-*.ksh linguist-vendored=false
+* linguist-detectable
+*.ksh linguist-detectable=false
