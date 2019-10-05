@@ -80,6 +80,21 @@ const char *getLaneSpinCamPatternName(LaneSpin::Type type)
     }
 }
 
+std::pair<std::string, int> splitKeySoundStr(const std::string & str)
+{
+    const std::size_t semicolonIdx = str.find(';');
+    if (semicolonIdx == std::string::npos)
+    {
+        return std::make_pair(str.substr(0, semicolonIdx), 100);
+    }
+    else
+    {
+        std::string filename = str.substr(0, semicolonIdx);
+        int vol = std::stoi(str.substr(semicolonIdx + 1));
+        return std::make_pair(filename, vol);
+    }
+}
+
 std::tuple<std::string, int, int> splitAudioEffectStr(const std::string & str)
 {
     const std::size_t semicolonIdx1 = str.find(';');
@@ -321,7 +336,11 @@ json getKsonAudioData(const ksh::PlayableChart & chart)
             { "preview_offset", std::stoi(chart.metaData.at("po")) },
             { "preview_duration", std::stoi(chart.metaData.at("plength")) },
         }},
-        { "key_sound", {} },
+        { "key_sound", {
+            { "def", {} },
+            { "pulse_event", {} },
+            { "note_event", {} },
+        }},
         { "audio_effect", {
             { "def", {} },
             { "pulse_event", {} },
@@ -339,6 +358,39 @@ json getKsonAudioData(const ksh::PlayableChart & chart)
         std::size_t idx = 0;
         for (const auto & [ y, fxNote ] : chart.fxLane(i))
         {
+            // Key sounds of chip FX notes
+            const std::string kshKeySoundKey = (i == 0) ? "fx-l_se" : "fx-r_se";
+            const auto & options = chart.positionalOptions();
+            if (fxNote.length == 0 && options.count(kshKeySoundKey) && options.at(kshKeySoundKey).count(y))
+            {
+                // TODO: add definitions of custom keysounds
+                auto [ filename, vol ] = splitKeySoundStr(options.at(kshKeySoundKey).at(y));
+                json v;
+                if (vol != 100)
+                {
+                    v = {
+                        { "vol", static_cast<double>(vol) / 100.0 },
+                    };
+                }
+
+                if (v.empty())
+                {
+                    audioData["key_sound"]["note_event"][filename]["fx"].push_back({
+                        { "lane", i },
+                        { "idx", idx },
+                    });
+                }
+                else
+                {
+                    audioData["key_sound"]["note_event"][filename]["fx"].push_back({
+                        { "lane", i },
+                        { "idx", idx },
+                        { "v", v },
+                    });
+                }
+            }
+
+            // Audio effects of long FX notes
             if (fxNote.length > 0 && !fxNote.audioEffectStr.empty())
             {
                 auto [ name, param1, param2 ] = splitAudioEffectStr(fxNote.audioEffectStr);
