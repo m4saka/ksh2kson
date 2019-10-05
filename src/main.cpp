@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cstddef>
 #include <nlohmann/json.hpp>
-#include "ksh/editable_chart.hpp"
+#include "ksh/playable_chart.hpp"
 
 using json = nlohmann::json;
 
@@ -103,7 +103,7 @@ std::tuple<std::string, int, int> splitAudioEffectStr(const std::string & str)
     }
 }
 
-json getKsonMetaData(const ksh::EditableChart & chart)
+json getKsonMetaData(const ksh::PlayableChart & chart)
 {
     json metaData = {
         { "title", chart.metaData.at("title") },
@@ -146,7 +146,7 @@ json getKsonMetaData(const ksh::EditableChart & chart)
     return metaData;
 }
 
-json getKsonBeatData(const ksh::EditableChart & chart)
+json getKsonBeatData(const ksh::PlayableChart & chart)
 {
     json beatData = {
         { "bpm", {} },
@@ -177,7 +177,7 @@ json getKsonBeatData(const ksh::EditableChart & chart)
     return beatData;
 }
 
-json getKsonGaugeData(const ksh::EditableChart & chart)
+json getKsonGaugeData(const ksh::PlayableChart & chart)
 {
     json gaugeData = {
         { "total", {} },
@@ -191,7 +191,7 @@ json getKsonGaugeData(const ksh::EditableChart & chart)
     return gaugeData;
 }
 
-json getKsonNoteData(const ksh::EditableChart & chart)
+json getKsonNoteData(const ksh::PlayableChart & chart)
 {
     json noteData = {};
 
@@ -273,7 +273,7 @@ json getKsonNoteData(const ksh::EditableChart & chart)
     return noteData;
 }
 
-json getKsonAudioData(const ksh::EditableChart & chart)
+json getKsonAudioData(const ksh::PlayableChart & chart)
 {
     json audioData = {
         { "bgm", {
@@ -351,7 +351,7 @@ json getKsonAudioData(const ksh::EditableChart & chart)
     return audioData;
 }
 
-json getKsonCameraData(const ksh::EditableChart & chart)
+json getKsonCameraData(const ksh::PlayableChart & chart)
 {
     json cameraData = {
         { "tilt", {
@@ -464,12 +464,12 @@ json getKsonCameraData(const ksh::EditableChart & chart)
     return cameraData;
 }
 
-json getKsonBgData(const ksh::EditableChart & chart)
+json getKsonBgData(const ksh::PlayableChart & chart)
 {
     return {};
 }
 
-json convertToKson(const ksh::EditableChart & chart)
+json convertToKson(const ksh::PlayableChart & chart)
 {
     return json{
         { "version", "1.0.0" },
@@ -490,7 +490,7 @@ int main(int argc, char *argv[])
     {
         for (int i = 1; i < argc; ++i)
         {
-            ksh::EditableChart chart(argv[i]);
+            ksh::PlayableChart chart(argv[i]);
             auto kson = convertToKson(chart);
 
             // TODO: Save to file

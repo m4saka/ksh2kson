@@ -65,7 +65,7 @@ namespace ksh
 
     void FXNoteBuilder::prepareNote(Measure y, bool halvesCombo, const std::string & audioEffectStr, const std::string & audioEffectParamStr, bool isEditor)
     {
-        if (!m_notePrepared && (!isEditor || audioEffectStr != m_preparedNoteAudioEffectStr || audioEffectParamStr != m_preparedNoteAudioEffectParamStr))
+        if (!m_notePrepared || (isEditor && (audioEffectStr != m_preparedNoteAudioEffectStr || audioEffectParamStr != m_preparedNoteAudioEffectParamStr)))
         {
             addPreparedNote();
             m_notePrepared = true;

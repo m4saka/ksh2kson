@@ -322,16 +322,8 @@ namespace ksh
                                 fxNoteBuilders[laneCount].addPreparedNote();
                                 break;
                             default:  // Long FX note
-                                if (isEditor)
-                                {
-                                    const std::string audioEffectStr = (buf[j] == '1') ? currentFXAudioEffectStrs[laneCount] : kshLegacyFXCharToAudioEffect(buf[j]);
-                                    fxNoteBuilders[laneCount].prepareNote(y, halvesCombo(currentTempo), audioEffectStr, currentFXAudioEffectParamStrs[laneCount], true);
-                                }
-                                else
-                                {
-                                    fxNoteBuilders[laneCount].prepareNote(y, halvesCombo(currentTempo));
-                                    // TODO: Add audio effects independently for the game (because one FX note can have multiple audio effects)
-                                }
+                                const std::string audioEffectStr = (buf[j] == '1') ? currentFXAudioEffectStrs[laneCount] : kshLegacyFXCharToAudioEffect(buf[j]);
+                                fxNoteBuilders[laneCount].prepareNote(y, halvesCombo(currentTempo), audioEffectStr, currentFXAudioEffectParamStrs[laneCount], isEditor);
                                 fxNoteBuilders[laneCount].extendPreparedNoteLength(lineYDiff);
                             }
                         }
