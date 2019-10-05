@@ -4,9 +4,10 @@
 
 - ~~Lane zooms~~
 - ~~Spins~~
+- ~~Default audio effects of FX notes (e.g. Flanger)~~
+    - Not yet: Simulating two different FX effects at the same time in kson specification by using parameter changes
+- Default audio effects of laser notes (e.g. HPF)
 - Background image / animations
-- Audio effects of FX notes (e.g. Flanger)
-- Audio effects of laser notes (e.g. HPF)
 - Key sounds of FX notes
 - Key sounds of laser slams
 - Scroll speed changes (stops)
