@@ -1,0 +1,2 @@
+* linguist-vendored
+*.ksh linguist-vendored=false
