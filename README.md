@@ -10,7 +10,7 @@
 - Background image / animations
 - ~~Key sounds of FX notes~~
 - Key sounds of laser slams
-- Scroll speed changes (stops)
+- ~~Scroll speed changes (stops)~~
 - Tilts
 - Movies
 - Custom audio effects
