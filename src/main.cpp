@@ -232,6 +232,27 @@ json getKsonBeatData(const ksh::PlayableChart & chart)
         });
     }
 
+    const auto & options = chart.positionalOptions();
+    if (options.count("stop"))
+    {
+        for (const auto & [ y, lengthStr ] : options.at("stop"))
+        {
+            beatData["scroll_speed"].push_back({
+                { "y", y },
+                { "v", {
+                    {
+                        { "ry", 0 },
+                        { "v", 0.0 },
+                    },
+                    {
+                        { "ry", std::stoll(lengthStr) * UNIT_MEASURE / 192 },
+                        { "v", 0.0 },
+                    },
+                }},
+            });
+        }
+    }
+
     return beatData;
 }
 
