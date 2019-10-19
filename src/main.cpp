@@ -156,6 +156,11 @@ std::tuple<std::string, int, int> splitAudioEffectStr(const std::string & str)
     }
 }
 
+bool fileExtensionExists(const std::string & filename)
+{
+    return filename.find('.') != std::string::npos;
+}
+
 json getKsonMetaData(const ksh::PlayableChart & chart)
 {
     json metaData = {
@@ -353,6 +358,10 @@ json getKsonAudioData(const ksh::PlayableChart & chart)
         audioData["bgm"]["vol"] = std::stod(chart.metaData.at("mvol")) / 100.0;
     }
 
+    // Custom key sounds to be defined
+    std::vector<std::string> customKeySoundFilenames;
+
+    // FX lane
     for (std::size_t i = 0; i < 2; ++i)
     {
         std::size_t idx = 0;
@@ -363,7 +372,6 @@ json getKsonAudioData(const ksh::PlayableChart & chart)
             const auto & options = chart.positionalOptions();
             if (fxNote.length == 0 && options.count(kshKeySoundKey) && options.at(kshKeySoundKey).count(y))
             {
-                // TODO: add definitions of custom keysounds
                 auto [ filename, vol ] = splitKeySoundStr(options.at(kshKeySoundKey).at(y));
                 json v;
                 if (vol != 100)
@@ -387,6 +395,12 @@ json getKsonAudioData(const ksh::PlayableChart & chart)
                         { "idx", idx },
                         { "v", v },
                     });
+                }
+
+                // Custom key sound
+                if (fileExtensionExists(filename))
+                {
+                    customKeySoundFilenames.push_back(filename);
                 }
             }
 
@@ -435,6 +449,14 @@ json getKsonAudioData(const ksh::PlayableChart & chart)
             }
             ++idx;
         }
+    }
+
+    // Insert definitions of custom key sounds
+    for (const auto & filename : customKeySoundFilenames)
+    {
+        audioData["key_sound"]["def"][filename] = {
+            { "filename", filename },
+        };
     }
 
     return audioData;
