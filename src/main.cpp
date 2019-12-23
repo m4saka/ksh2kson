@@ -598,7 +598,17 @@ json getKsonCameraData(const ksh::PlayableChart & chart)
 
 json getKsonBgData(const ksh::PlayableChart & chart)
 {
-    return {};
+    json bgData = {
+        { "legacy", {
+            { "bg", {
+                { "filename", chart.metaData.at("bg") },
+            }},
+            { "layer", {
+                { "filename", chart.metaData.at("layer") },
+            }},
+        }},
+    };
+    return bgData;
 }
 
 json convertToKson(const ksh::PlayableChart & chart)
