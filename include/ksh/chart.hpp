@@ -29,6 +29,8 @@ namespace ksh
 
         std::string toString() const;
 
+        bool isVersionNewerThanOrEqualTo(int version) const;
+
         bool isUTF8() const
         {
             return m_isUTF8;

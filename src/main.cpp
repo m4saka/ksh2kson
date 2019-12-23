@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <cstddef>
 #include <nlohmann/json.hpp>
 #include "ksh/playable_chart.hpp"
@@ -598,17 +599,43 @@ json getKsonCameraData(const ksh::PlayableChart & chart)
 
 json getKsonBgData(const ksh::PlayableChart & chart)
 {
-    json bgData = {
+    // Specify layer separator
+    static constexpr int LAYER_SEPARATOR_CHANGED_VERSION = 166;
+    const bool separatorChanged = chart.isVersionNewerThanOrEqualTo(LAYER_SEPARATOR_CHANGED_VERSION);
+    const char separator = separatorChanged ? ';' : '/';
+
+    // Split layer option string
+    const std::string layerStr = chart.metaData.at("layer");
+    std::stringstream ss(layerStr);
+    std::string str;
+    std::string layerFilename = std::getline(ss, str, separator) ? str : std::string();
+    int layerDuration = std::getline(ss, str, separator) ? std::stoi(str) : 0;
+    int layerRotationBits = std::getline(ss, str, separator) ? std::stoi(str) : 3;
+
+    // Set layer information
+    json layer = {
+        { "filename", layerFilename },
+    };
+    if (layerDuration > 0)
+    {
+        layer["duration"] = layerDuration;
+    }
+    if (layerRotationBits != 3)
+    {
+        layer["rotation"] = {
+            { "tilt", (layerRotationBits & 0b01) != 0 },
+            { "spin", (layerRotationBits & 0b10) != 0 },
+        };
+    }
+
+    return {
         { "legacy", {
             { "bg", {
                 { "filename", chart.metaData.at("bg") },
             }},
-            { "layer", {
-                { "filename", chart.metaData.at("layer") },
-            }},
+            { "layer", layer },
         }},
     };
-    return bgData;
 }
 
 json convertToKson(const ksh::PlayableChart & chart)

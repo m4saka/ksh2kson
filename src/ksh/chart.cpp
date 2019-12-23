@@ -121,4 +121,19 @@ namespace ksh
         return oss.str();
     }
 
+    bool Chart::isVersionNewerThanOrEqualTo(int version) const
+    {
+        int chartVersion;
+        if (metaData.count("ver"))
+        {
+            chartVersion = std::stoi(metaData.at("ver"));
+        }
+        else
+        {
+            chartVersion = 100;
+        }
+        
+        return chartVersion >= version;
+    }
+
 }
