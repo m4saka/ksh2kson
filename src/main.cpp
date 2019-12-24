@@ -81,12 +81,25 @@ const char *getLaneSpinCamPatternName(LaneSpin::Type type)
     }
 }
 
+std::pair<std::string, std::string> splitSemicolonSeparatedPair(const std::string & str)
+{
+    const std::size_t semicolonIdx = str.find(';');
+    if (semicolonIdx == std::string::npos)
+    {
+        return std::make_pair(str, std::string());
+    }
+    else
+    {
+        return std::make_pair(str.substr(0, semicolonIdx), str.substr(semicolonIdx + 1));
+    }
+}
+
 std::pair<std::string, int> splitKeySoundStr(const std::string & str)
 {
     const std::size_t semicolonIdx = str.find(';');
     if (semicolonIdx == std::string::npos)
     {
-        return std::make_pair(str.substr(0, semicolonIdx), 100);
+        return std::make_pair(str, 100);
     }
     else
     {
@@ -609,6 +622,19 @@ json getKsonCameraData(const ksh::PlayableChart & chart)
 
 json getKsonBgData(const ksh::PlayableChart & chart)
 {
+    // Set bg information
+    auto [ bgFilename1, bgFilename2 ] = splitSemicolonSeparatedPair(chart.metaData.at("bg"));
+    json bg = {};
+    bg.push_back({
+        { "filename", bgFilename1 },
+    });
+    if (!bgFilename2.empty())
+    {
+        bg.push_back({
+            { "filename", bgFilename2 },
+        });
+    }
+
     // Specify layer separator
     static constexpr int LAYER_SEPARATOR_CHANGED_VERSION = 166;
     const bool separatorChanged = chart.isVersionNewerThanOrEqualTo(LAYER_SEPARATOR_CHANGED_VERSION);
@@ -623,16 +649,16 @@ json getKsonBgData(const ksh::PlayableChart & chart)
     int layerRotationBits = std::getline(ss, str, separator) ? std::stoi(str) : 3;
 
     // Set layer information
-    json layer = {
+    json layer = {{
         { "filename", layerFilename },
-    };
+    }};
     if (layerDuration > 0)
     {
-        layer["duration"] = layerDuration;
+        layer[0]["duration"] = layerDuration;
     }
     if (layerRotationBits != 3)
     {
-        layer["rotation"] = {
+        layer[0]["rotation"] = {
             { "tilt", (layerRotationBits & 0b01) != 0 },
             { "spin", (layerRotationBits & 0b10) != 0 },
         };
@@ -640,9 +666,7 @@ json getKsonBgData(const ksh::PlayableChart & chart)
 
     return {
         { "legacy", {
-            { "bg", {
-                { "filename", chart.metaData.at("bg") },
-            }},
+            { "bg", bg },
             { "layer", layer },
         }},
     };
