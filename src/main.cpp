@@ -664,12 +664,22 @@ json getKsonBgData(const ksh::PlayableChart & chart)
         };
     }
 
-    return {
+    json bgData = {
         { "legacy", {
             { "bg", bg },
             { "layer", layer },
         }},
     };
+
+    if (chart.metaData.count("v"))
+    {
+        bgData["legacy"]["movie"] = {
+            { "filename", chart.metaData.at("v") },
+            { "offset", chart.metaData.count("vo") ? std::stoi(chart.metaData.at("vo")) : 0 },
+        };
+    }
+
+    return bgData;
 }
 
 json convertToKson(const ksh::PlayableChart & chart)
