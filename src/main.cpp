@@ -375,9 +375,17 @@ json getKsonAudioData(const ksh::PlayableChart & chart)
         }},
     };
 
+    // For historical reasons, the value is multiplied by 0.6 if "ver" is not specified
+    double volScale = chart.metaData.count("ver") ? 1.0 : 0.6;
+
+    // Song volume
     if (chart.metaData.count("mvol"))
     {
-        audioData["bgm"]["vol"] = std::stod(chart.metaData.at("mvol")) / 100.0;
+        audioData["bgm"]["vol"] = std::stod(chart.metaData.at("mvol")) / 100.0 * volScale;
+    }
+    else
+    {
+        audioData["bgm"]["vol"] = volScale;
     }
 
     // Custom key sounds to be defined
