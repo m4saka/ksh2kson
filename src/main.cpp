@@ -466,6 +466,7 @@ json getKsonAudioData(const ksh::PlayableChart & chart)
                     audioData["audio_effect"]["note_event"][name]["fx"].push_back({
                         { "lane", i },
                         { "idx", idx },
+                        { "c", true },
                     });
                 }
                 else
@@ -473,6 +474,7 @@ json getKsonAudioData(const ksh::PlayableChart & chart)
                     audioData["audio_effect"]["note_event"][name]["fx"].push_back({
                         { "lane", i },
                         { "idx", idx },
+                        { "c", true },
                         { "v", v },
                     });
                 }
