@@ -6,7 +6,8 @@
 using Measure = int64_t;
 constexpr Measure UNIT_MEASURE = 240 * 4;
 
-struct TimeSignature
+// Time signature
+struct TimeSig
 {
 public:
     uint32_t numerator;

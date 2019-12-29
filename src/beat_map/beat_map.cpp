@@ -1,9 +1,9 @@
 #include "beat_map/beat_map.hpp"
 #include <cassert>
 
-BeatMap::BeatMap(const std::map<Measure, double>& tempoChanges, const std::map<int, TimeSignature>& timeSignatureChanges)
+BeatMap::BeatMap(const std::map<Measure, double>& tempoChanges, const std::map<int, TimeSig>& timeSigChanges)
     : m_tempoChanges(tempoChanges)
-    , m_timeSignatureChanges(timeSignatureChanges)
+    , m_timeSigChanges(timeSigChanges)
 {
     // There must be at least one tempo change
     assert(m_tempoChanges.size() > 0);
@@ -12,18 +12,18 @@ BeatMap::BeatMap(const std::map<Measure, double>& tempoChanges, const std::map<i
     assert(m_tempoChanges.count(0) > 0);
 
     // There must be at least one time signature change
-    assert(m_timeSignatureChanges.size() > 0);
+    assert(m_timeSigChanges.size() > 0);
 
     // Time signature at zero position must be set
-    assert(m_timeSignatureChanges.count(0) > 0);
+    assert(m_timeSigChanges.count(0) > 0);
 
     // The first tempo change should be placed at 0.0 ms
     m_tempoChangeMsCache[0] = 0.0;
     m_tempoChangeMeasureCache[0.0] = 0;
 
     // The first time signature change should be placed at 0.0 ms
-    m_timeSignatureChangeMeasureCache[0] = 0;
-    m_timeSignatureChangeMeasureCountCache[0] = 0;
+    m_timeSigChangeMeasureCache[0] = 0;
+    m_timeSigChangeMeasureCountCache[0] = 0;
 
     // Calculate ms for each tempo change
     {
@@ -39,11 +39,11 @@ BeatMap::BeatMap(const std::map<Measure, double>& tempoChanges, const std::map<i
     // Calculate measure count for each time signature change
     {
         Measure measure = 0;
-        for (auto itr = std::next(m_timeSignatureChanges.cbegin()); itr != m_timeSignatureChanges.cend(); ++itr)
+        for (auto itr = std::next(m_timeSigChanges.cbegin()); itr != m_timeSigChanges.cend(); ++itr)
         {
             measure += (itr->first - std::prev(itr)->first) * (UNIT_MEASURE * std::prev(itr)->second.numerator / std::prev(itr)->second.denominator);
-            m_timeSignatureChangeMeasureCache[itr->first] = measure;
-            m_timeSignatureChangeMeasureCountCache[measure] = itr->first;
+            m_timeSigChangeMeasureCache[itr->first] = measure;
+            m_timeSigChangeMeasureCountCache[measure] = itr->first;
         }
     }
 }
@@ -75,11 +75,11 @@ Measure BeatMap::msToMeasure(Ms ms) const
 int BeatMap::measureToMeasureCount(Measure measure) const
 {
     // Fetch the nearest time signature change
-    auto itr = m_timeSignatureChangeMeasureCountCache.upper_bound(measure);
-    if (itr != m_timeSignatureChangeMeasureCountCache.begin()) --itr;
+    auto itr = m_timeSigChangeMeasureCountCache.upper_bound(measure);
+    if (itr != m_timeSigChangeMeasureCountCache.begin()) --itr;
 
     // Calculate measure count using time difference from nearest time signature change
-    int measureCount = itr->second + static_cast<int>((measure - itr->first) / m_timeSignatureChanges.at(itr->second).measure());
+    int measureCount = itr->second + static_cast<int>((measure - itr->first) / m_timeSigChanges.at(itr->second).measure());
 
     return measureCount;
 }
@@ -92,22 +92,22 @@ int BeatMap::msToMeasureCount(Ms ms) const
 Measure BeatMap::measureCountToMeasure(int measureCount) const
 {
     // Fetch the nearest time signature change
-    auto itr = m_timeSignatureChangeMeasureCache.upper_bound(measureCount);
-    if (itr != m_timeSignatureChangeMeasureCache.begin()) --itr;
+    auto itr = m_timeSigChangeMeasureCache.upper_bound(measureCount);
+    if (itr != m_timeSigChangeMeasureCache.begin()) --itr;
 
     // Calculate measure using measure count difference from nearest time signature change
-    Measure measure = itr->second + static_cast<Measure>((measureCount - itr->first) * m_timeSignatureChanges.at(itr->first).measure());
+    Measure measure = itr->second + static_cast<Measure>((measureCount - itr->first) * m_timeSigChanges.at(itr->first).measure());
     return measure;
 }
 
 Measure BeatMap::measureCountToMeasure(double measureCount) const
 {
     // Fetch the nearest time signature change
-    auto itr = m_timeSignatureChangeMeasureCache.upper_bound(static_cast<int>(measureCount));
-    if (itr != m_timeSignatureChangeMeasureCache.begin()) --itr;
+    auto itr = m_timeSigChangeMeasureCache.upper_bound(static_cast<int>(measureCount));
+    if (itr != m_timeSigChangeMeasureCache.begin()) --itr;
 
     // Calculate measure using measure count difference from nearest time signature change
-    Measure measure = itr->second + static_cast<Measure>((measureCount - itr->first) * m_timeSignatureChanges.at(itr->first).measure());
+    Measure measure = itr->second + static_cast<Measure>((measureCount - itr->first) * m_timeSigChanges.at(itr->first).measure());
     return measure;
 }
 
@@ -124,10 +124,10 @@ Ms BeatMap::measureCountToMs(double measureCount) const
 bool BeatMap::isBarLine(Measure measure) const
 {
     // Fetch the nearest time signature change
-    auto itr = m_timeSignatureChangeMeasureCountCache.upper_bound(measure);
-    if (itr != m_timeSignatureChangeMeasureCountCache.begin()) --itr;
+    auto itr = m_timeSigChangeMeasureCountCache.upper_bound(measure);
+    if (itr != m_timeSigChangeMeasureCountCache.begin()) --itr;
 
-    return ((measure - itr->first) % m_timeSignatureChanges.at(itr->second).measure()) == 0;
+    return ((measure - itr->first) % m_timeSigChanges.at(itr->second).measure()) == 0;
 }
 
 double BeatMap::tempo(Measure measure) const
@@ -139,11 +139,11 @@ double BeatMap::tempo(Measure measure) const
     return itr->second;
 }
 
-TimeSignature BeatMap::timeSignature(Measure measure) const
+TimeSig BeatMap::timeSig(Measure measure) const
 {
     // Fetch the nearest time signature change
-    auto itr = m_timeSignatureChangeMeasureCountCache.upper_bound(measure);
-    if (itr != m_timeSignatureChangeMeasureCountCache.begin()) --itr;
+    auto itr = m_timeSigChangeMeasureCountCache.upper_bound(measure);
+    if (itr != m_timeSigChangeMeasureCountCache.begin()) --itr;
 
-    return m_timeSignatureChanges.at(itr->second);
+    return m_timeSigChanges.at(itr->second);
 }

@@ -94,12 +94,12 @@ namespace ksh
         }
     }
 
-    TimeSignature parseTimeSignature(std::string str)
+    TimeSig parseTimeSig(std::string str)
     {
         std::size_t slashIdx = str.find('/');
         assert(slashIdx != std::string::npos);
 
-        return TimeSignature{
+        return TimeSig{
             static_cast<uint32_t>(std::stoi(str.substr(0, slashIdx))),
             static_cast<uint32_t>(std::stoi(str.substr(slashIdx + 1)))
         };
@@ -114,7 +114,7 @@ namespace ksh
         // TODO: Catch exceptions from std::stod()
 
         std::map<Measure, double> tempoChanges;
-        std::map<int, TimeSignature> timeSignatureChanges;
+        std::map<int, TimeSig> timeSigChanges;
 
         // Note builders for note insertion to lanes
         std::vector<BTNoteBuilder> btNoteBuilders;
@@ -154,17 +154,17 @@ namespace ksh
         uint32_t currentDenominator = 4;
         if (metaData.count("beat"))
         {
-            TimeSignature timeSignature = parseTimeSignature(metaData.at("beat"));
-            timeSignatureChanges.emplace(
+            TimeSig timeSig = parseTimeSig(metaData.at("beat"));
+            timeSigChanges.emplace(
                 0,
-                timeSignature
+                timeSig
             );
-            currentNumerator = timeSignature.numerator;
-            currentDenominator = timeSignature.denominator;
+            currentNumerator = timeSig.numerator;
+            currentDenominator = timeSig.denominator;
         }
         else
         {
-            timeSignatureChanges[0] = { 4, 4 };
+            timeSigChanges[0] = { 4, 4 };
         }
 
         // Buffers
@@ -215,13 +215,13 @@ namespace ksh
                 }
                 else if (key == "beat")
                 {
-                    TimeSignature timeSignature = parseTimeSignature(value);
-                    timeSignatureChanges.emplace(
+                    TimeSig timeSig = parseTimeSig(value);
+                    timeSigChanges.emplace(
                         measureCount,
-                        timeSignature
+                        timeSig
                     );
-                    currentNumerator = timeSignature.numerator;
-                    currentDenominator = timeSignature.denominator;
+                    currentNumerator = timeSig.numerator;
+                    currentDenominator = timeSig.denominator;
                 }
                 else if (key == "fx-l")
                 {
@@ -381,7 +381,7 @@ namespace ksh
 
         m_ifs.close();
 
-        m_beatMap = std::make_unique<BeatMap>(tempoChanges, timeSignatureChanges);
+        m_beatMap = std::make_unique<BeatMap>(tempoChanges, timeSigChanges);
     }
 
     std::size_t PlayableChart::comboCount() const

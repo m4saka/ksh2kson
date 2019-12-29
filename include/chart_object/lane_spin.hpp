@@ -3,7 +3,7 @@
 #include <string>
 #include <cassert>
 
-#include "beat_map/time_signature.hpp"
+#include "beat_map/time_sig.hpp"
 
 struct LaneSpin
 {

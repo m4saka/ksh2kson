@@ -235,13 +235,13 @@ json getKsonBeatData(const ksh::PlayableChart & chart)
         });
     }
 
-    for (const auto & [ idx, timeSignature ] : chart.beatMap().timeSignatureChanges())
+    for (const auto & [ idx, timeSig ] : chart.beatMap().timeSigChanges())
     {
         beatData["time_sig"].push_back({
             { "idx", idx },
             { "v", {
-                { "n", timeSignature.numerator },
-                { "d", timeSignature.denominator },
+                { "n", timeSig.numerator },
+                { "d", timeSig.denominator },
             }},
         });
     }

@@ -2,7 +2,7 @@
 
 #include <sstream>
 #include <tuple>
-#include "beat_map/time_signature.hpp"
+#include "beat_map/time_sig.hpp"
 
 Measure kshLengthToMeasure(const std::string & str)
 {
