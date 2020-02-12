@@ -174,7 +174,7 @@ namespace ksh
         std::vector<OptionLine> optionLines;
 
         Measure currentMeasure = 0;
-        std::size_t measureCount = 0;
+        int measureCount = 0;
 
         // Read chart body
         // Expect m_ifs to start from the next of the first bar line ("--")
