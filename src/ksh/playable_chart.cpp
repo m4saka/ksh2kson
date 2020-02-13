@@ -1,5 +1,6 @@
 #include "ksh/playable_chart.hpp"
 
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <cassert>
@@ -16,6 +17,14 @@ namespace ksh
     constexpr std::size_t BLOCK_BT = 0;
     constexpr std::size_t BLOCK_FX = 1;
     constexpr std::size_t BLOCK_LASER = 2;
+
+    // Maximum value of zoom
+    constexpr double ZOOM_ABS_MAX_LEGACY = 300.0; // ver <  1.67
+    constexpr double ZOOM_ABS_MAX = 65535.0;      // ver >= 1.67
+
+    // Maximum number of characters of the zoom value
+    constexpr std::size_t ZOOM_MAX_CHAR_LEGACY = 4;          // ver <  1.67
+    constexpr std::size_t ZOOM_MAX_CHAR = std::string::npos; // ver >= 1.67
 
     bool isChartLine(const std::string & line)
     {
@@ -117,6 +126,10 @@ namespace ksh
         , m_laserLanes(2)
     {
         // TODO: Catch exceptions from std::stod()
+
+        // For backward compatibility of zoom_top/zoom_bottom/zoom_side
+        const double zoomAbsMax = isVersionNewerThanOrEqualTo(167) ? ZOOM_ABS_MAX : ZOOM_ABS_MAX_LEGACY;
+        const std::size_t zoomMaxChar = isVersionNewerThanOrEqualTo(167) ? ZOOM_MAX_CHAR : ZOOM_MAX_CHAR_LEGACY;
 
         std::map<Measure, double> tempoChanges;
         std::map<int, TimeSig> timeSigChanges;
@@ -265,15 +278,27 @@ namespace ksh
                     }
                     else if (key == "zoom_top")
                     {
-                        m_zoomTop.insert(y, std::stod(value));
+                        double dValue = std::stod(value.substr(0, zoomMaxChar));
+                        if (std::abs(dValue) <= zoomAbsMax)
+                        {
+                            m_zoomTop.insert(y, dValue);
+                        }
                     }
                     else if (key == "zoom_bottom")
                     {
-                        m_zoomBottom.insert(y, std::stod(value));
+                        double dValue = std::stod(value.substr(0, zoomMaxChar));
+                        if (std::abs(dValue) <= zoomAbsMax)
+                        {
+                            m_zoomBottom.insert(y, dValue);
+                        }
                     }
                     else if (key == "zoom_side")
                     {
-                        m_zoomSide.insert(y, std::stod(value));
+                        double dValue = std::stod(value.substr(0, zoomMaxChar));
+                        if (std::abs(dValue) <= zoomAbsMax)
+                        {
+                            m_zoomSide.insert(y, dValue);
+                        }
                     }
                     else if (key == "center_split")
                     {
