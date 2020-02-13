@@ -26,6 +26,10 @@ namespace ksh
     constexpr std::size_t ZOOM_MAX_CHAR_LEGACY = 4;          // ver <  1.67
     constexpr std::size_t ZOOM_MAX_CHAR = std::string::npos; // ver >= 1.67
 
+    // Maximum value of center_split / manual tilt
+    constexpr double CENTER_SPLIT_ABS_MAX = 65535.0;
+    constexpr double MANUAL_TILT_ABS_MAX = 1000.0;
+
     bool isChartLine(const std::string & line)
     {
         return line.find(BLOCK_SEPARATOR) != std::string::npos;
@@ -302,14 +306,22 @@ namespace ksh
                     }
                     else if (key == "center_split")
                     {
-                        m_centerSplit.insert(y, std::stod(value));
+                        double dValue = std::stod(value);
+                        if (std::abs(dValue) <= CENTER_SPLIT_ABS_MAX)
+                        {
+                            m_centerSplit.insert(y, dValue);
+                        }
                     }
                     else if (key == "tilt")
                     {
                         if (isManualTiltValue(value))
                         {
-                            m_manualTilt.insert(y, std::stod(value));
-                            m_positionalOptions[key][y] = "manual";
+                            double dValue = std::stod(value);
+                            if (std::abs(dValue) <= MANUAL_TILT_ABS_MAX)
+                            {
+                                m_manualTilt.insert(y, std::stod(value));
+                                m_positionalOptions[key][y] = "manual";
+                            }
                         }
                         else
                         {
