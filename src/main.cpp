@@ -530,7 +530,7 @@ json getKsonCameraData(const ksh::PlayableChart & chart)
         }},
     };
 
-    for (const auto & [ y, zoom ] : chart.bottomLaneZooms())
+    for (const auto & [ y, zoom ] : chart.zoomBottom())
     {
         cameraData["body"]["zoom"].push_back({
             { "y", y },
@@ -542,19 +542,7 @@ json getKsonCameraData(const ksh::PlayableChart & chart)
         }
     }
 
-    for (const auto & [ y, zoom ] : chart.topLaneZooms())
-    {
-        cameraData["body"]["rotation_x"].push_back({
-            { "y", y },
-            { "v", zoom.first / 100.0 },
-        });
-        if (zoom.first != zoom.second)
-        {
-            cameraData["body"]["rotation_x"].back()["vf"] = zoom.second / 100.0;
-        }
-    }
-
-    for (const auto & [ y, zoom ] : chart.sideLaneZooms())
+    for (const auto & [ y, zoom ] : chart.zoomSide())
     {
         cameraData["body"]["shift_x"].push_back({
             { "y", y },
@@ -563,6 +551,18 @@ json getKsonCameraData(const ksh::PlayableChart & chart)
         if (zoom.first != zoom.second)
         {
             cameraData["body"]["shift_x"].back()["vf"] = zoom.second / 100.0;
+        }
+    }
+
+    for (const auto & [ y, zoom ] : chart.zoomTop())
+    {
+        cameraData["body"]["rotation_x"].push_back({
+            { "y", y },
+            { "v", zoom.first / 100.0 },
+        });
+        if (zoom.first != zoom.second)
+        {
+            cameraData["body"]["rotation_x"].back()["vf"] = zoom.second / 100.0;
         }
     }
 

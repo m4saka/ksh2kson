@@ -6,11 +6,11 @@
 namespace ksh
 {
 
-    Chart::Chart(const std::string & filename, bool keepFileStreamOpen)
+    Chart::Chart(std::string_view filename, bool keepFileStreamOpen)
         : m_filename(filename)
         , m_fileDirectoryPath(filename.substr(0, filename.find_last_of("/\\")))
     {
-        m_ifs.open(filename, std::ifstream::in); // TODO: Error handling
+        m_ifs.open(filename.data(), std::ifstream::in); // TODO: Error handling
 
         // Eliminate UTF-8 BOM
         std::string firstLine;
@@ -70,7 +70,7 @@ namespace ksh
         }
     }
 
-    Chart::Chart(const std::string & filename) : Chart(filename, false)
+    Chart::Chart(std::string_view filename) : Chart(filename, false)
     {
     }
 

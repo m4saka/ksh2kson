@@ -32,7 +32,7 @@ namespace ksh
         return line == MEASURE_SEPARATOR;
     }
 
-    std::pair<std::string, std::string> splitOptionLine(const std::string optionLine)
+    std::pair<std::string, std::string> splitOptionLine(const std::string & optionLine)
     {
         std::size_t equalIdx = optionLine.find_first_of(OPTION_SEPARATOR);
 
@@ -94,7 +94,7 @@ namespace ksh
         }
     }
 
-    TimeSig parseTimeSig(std::string str)
+    TimeSig parseTimeSig(const std::string & str)
     {
         std::size_t slashIdx = str.find('/');
         assert(slashIdx != std::string::npos);
@@ -105,7 +105,7 @@ namespace ksh
         };
     }
 
-    PlayableChart::PlayableChart(const std::string & filename, bool isEditor)
+    PlayableChart::PlayableChart(std::string_view filename, bool isEditor)
         : Chart(filename, true)
         , m_btLanes(4)
         , m_fxLanes(2)
@@ -260,15 +260,19 @@ namespace ksh
                     }
                     else if (key == "zoom_top")
                     {
-                        m_topLaneZooms.insert(y, std::stod(value));
+                        m_zoomTop.insert(y, std::stod(value));
                     }
                     else if (key == "zoom_bottom")
                     {
-                        m_bottomLaneZooms.insert(y, std::stod(value));
+                        m_zoomBottom.insert(y, std::stod(value));
                     }
                     else if (key == "zoom_side")
                     {
-                        m_sideLaneZooms.insert(y, std::stod(value));
+                        m_zoomSide.insert(y, std::stod(value));
+                    }
+                    else if (key == "center_split")
+                    {
+                        m_centerSplit.insert(y, std::stod(value));
                     }
                     else
                     {

@@ -30,14 +30,15 @@ namespace ksh
         std::vector<Lane<BTNote>> m_btLanes;
         std::vector<Lane<FXNote>> m_fxLanes;
         std::vector<Lane<LaserNote>> m_laserLanes;
-        LineGraph m_topLaneZooms;
-        LineGraph m_bottomLaneZooms;
-        LineGraph m_sideLaneZooms;
+        LineGraph m_zoomTop;
+        LineGraph m_zoomBottom;
+        LineGraph m_zoomSide;
+        LineGraph m_centerSplit;
         std::unordered_map<std::string, std::map<Measure, std::string>> m_positionalOptions;
-        PlayableChart(const std::string & filename, bool isEditor);
+        PlayableChart(std::string_view filename, bool isEditor);
 
     public:
-        PlayableChart(const std::string & filename) : PlayableChart(filename, false) {}
+        PlayableChart(std::string_view filename) : PlayableChart(filename, false) {}
 
         virtual ~PlayableChart() = default;
 
@@ -76,19 +77,24 @@ namespace ksh
             return m_laserLanes;
         }
 
-        const LineGraph & topLaneZooms() const
+        const LineGraph & zoomTop() const
         {
-            return m_topLaneZooms;
+            return m_zoomTop;
         }
 
-        const LineGraph & bottomLaneZooms() const
+        const LineGraph & zoomBottom() const
         {
-            return m_bottomLaneZooms;
+            return m_zoomBottom;
         }
 
-        const LineGraph & sideLaneZooms() const
+        const LineGraph & zoomSide() const
         {
-            return m_sideLaneZooms;
+            return m_zoomSide;
+        }
+
+        const LineGraph & centerSplit() const
+        {
+            return m_centerSplit;
         }
 
         const std::unordered_map<std::string, std::map<Measure, std::string>> & positionalOptions() const

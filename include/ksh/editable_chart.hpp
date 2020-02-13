@@ -9,7 +9,7 @@ namespace ksh
     class EditableChart : public PlayableChart
     {
     public:
-        EditableChart(const std::string & filename) : PlayableChart(filename, true) {}
+        EditableChart(std::string_view filename) : PlayableChart(filename, true) {}
 
         using PlayableChart::btLane;
         using PlayableChart::fxLane;
