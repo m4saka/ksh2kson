@@ -76,6 +76,11 @@ namespace ksh
         }
     }
 
+    bool isManualTiltValue(const std::string & value)
+    {
+        return !value.empty() && value[0] >= '0' && value[0] <= '9';
+    }
+
     bool PlayableChart::insertTempoChange(std::map<Measure, double> & tempoChanges, Measure y, const std::string & value)
     {
         if (tempoChanges.count(y))
@@ -273,6 +278,23 @@ namespace ksh
                     else if (key == "center_split")
                     {
                         m_centerSplit.insert(y, std::stod(value));
+                    }
+                    else if (key == "tilt")
+                    {
+                        if (isManualTiltValue(value))
+                        {
+                            m_manualTilt.insert(y, std::stod(value));
+                            m_positionalOptions[key][y] = "manual";
+                        }
+                        else
+                        {
+                            if (!m_positionalOptions[key].empty() && (*m_positionalOptions[key].rbegin()).second == "manual")
+                            {
+                                // Insert previous value to keep last value until non-manual tilt type is set
+                                m_manualTilt.insert(y, m_manualTilt.valueAt(y));
+                            }
+                            m_positionalOptions[key][y] = value;
+                        }
                     }
                     else
                     {

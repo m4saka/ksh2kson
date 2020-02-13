@@ -34,6 +34,7 @@ namespace ksh
         LineGraph m_zoomBottom;
         LineGraph m_zoomSide;
         LineGraph m_centerSplit;
+        LineGraph m_manualTilt;
         std::unordered_map<std::string, std::map<Measure, std::string>> m_positionalOptions;
         PlayableChart(std::string_view filename, bool isEditor);
 
@@ -95,6 +96,11 @@ namespace ksh
         const LineGraph & centerSplit() const
         {
             return m_centerSplit;
+        }
+
+        const LineGraph & manualTilt() const
+        {
+            return m_manualTilt;
         }
 
         const std::unordered_map<std::string, std::map<Measure, std::string>> & positionalOptions() const
