@@ -78,7 +78,7 @@ namespace ksh
 
     bool isManualTiltValue(const std::string & value)
     {
-        return !value.empty() && value[0] >= '0' && value[0] <= '9';
+        return !value.empty() && ((value[0] >= '0' && value[0] <= '9') || value[0] == '-');
     }
 
     bool PlayableChart::insertTempoChange(std::map<Measure, double> & tempoChanges, Measure y, const std::string & value)
