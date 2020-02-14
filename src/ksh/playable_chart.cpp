@@ -283,7 +283,7 @@ namespace ksh
                     else if (key == "zoom_top")
                     {
                         double dValue = std::stod(value.substr(0, zoomMaxChar));
-                        if (std::abs(dValue) <= zoomAbsMax)
+                        if (std::abs(dValue) <= zoomAbsMax || (!isVersionNewerThanOrEqualTo(167) && m_zoomTop.count(y) > 0))
                         {
                             m_zoomTop.insert(y, dValue);
                         }
@@ -291,7 +291,7 @@ namespace ksh
                     else if (key == "zoom_bottom")
                     {
                         double dValue = std::stod(value.substr(0, zoomMaxChar));
-                        if (std::abs(dValue) <= zoomAbsMax)
+                        if (std::abs(dValue) <= zoomAbsMax || (!isVersionNewerThanOrEqualTo(167) && m_zoomBottom.count(y) > 0))
                         {
                             m_zoomBottom.insert(y, dValue);
                         }
@@ -299,7 +299,7 @@ namespace ksh
                     else if (key == "zoom_side")
                     {
                         double dValue = std::stod(value.substr(0, zoomMaxChar));
-                        if (std::abs(dValue) <= zoomAbsMax)
+                        if (std::abs(dValue) <= zoomAbsMax || (!isVersionNewerThanOrEqualTo(167) && m_zoomSide.count(y) > 0))
                         {
                             m_zoomSide.insert(y, dValue);
                         }
