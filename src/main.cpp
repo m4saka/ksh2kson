@@ -637,7 +637,7 @@ json getKsonBgData(const ksh::PlayableChart & chart)
 
     // Specify layer separator
     static constexpr int LAYER_SEPARATOR_CHANGED_VERSION = 166;
-    const bool separatorChanged = chart.isVersionNewerThanOrEqualTo(LAYER_SEPARATOR_CHANGED_VERSION);
+    const bool separatorChanged = chart.isKshVersionNewerThanOrEqualTo(LAYER_SEPARATOR_CHANGED_VERSION);
     const char separator = separatorChanged ? ';' : '/';
 
     // Split layer option string
