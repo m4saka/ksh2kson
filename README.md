@@ -1,8 +1,18 @@
 # ksh2kson (work in progress)
 
+Note: This project is in the very early stage of development.
+
 ## KSON Format Specification
 
 See it here: [kson_format.md](kson_format.md)
+
+## Compilation
+
+```
+$ mkdir build && cd build
+$ cmake ..
+$ make
+```
 
 ## TODO List
 
