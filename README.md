@@ -1,5 +1,9 @@
 # ksh2kson (work in progress)
 
+## KSON Format Specification
+
+See it here: [kson_format.md](kson_format.md)
+
 ## TODO List
 
 - ~~Lane zooms~~
