@@ -685,7 +685,7 @@ json getKsonBgData(const ksh::PlayableChart & chart)
 json convertToKson(const ksh::PlayableChart & chart)
 {
     return json{
-        { "version", "1.0.0" },
+        { "version", "0.1.0" },
         { "meta", getKsonMetaData(chart) },
         { "beat", getKsonBeatData(chart) },
         { "gauge", getKsonGaugeData(chart) },
